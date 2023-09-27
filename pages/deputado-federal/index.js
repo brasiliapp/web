@@ -104,7 +104,7 @@ export default function Index({ data }) {
     switch (columnKey) {
       case "nome":
         return (
-          <Button
+          <a
             href={`/deputado-federal/${slugify(user.nome).concat(
               `-${user.id}`
             )}`}
@@ -120,13 +120,13 @@ export default function Index({ data }) {
             >
               {user.nome}
             </User>
-          </Button>
+          </a>
         );
       case "partido":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <Button
+            <a
               href={`/deputado-federal/${slugify(user.nome).concat(
                 `-${user.id}`
               )}`}
@@ -137,14 +137,14 @@ export default function Index({ data }) {
               <p className="text-bold text-tiny capitalize text-default-400">
                 {user.siglaPartido}
               </p>
-            </Button>
+            </a>
           </div>
         );
       case "estado":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <Button
+            <a
               href={`/deputado-federal/${slugify(user.nome).concat(
                 `-${user.id}`
               )}`}
@@ -155,7 +155,7 @@ export default function Index({ data }) {
               <p className="text-bold text-tiny capitalize text-default-400">
                 {user.siglaUf}
               </p>
-            </Button>
+            </a>
           </div>
         );
 
