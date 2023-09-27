@@ -1,4 +1,4 @@
-import { React, useState, useMemo } from "react";
+import { React, useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 
@@ -43,6 +43,7 @@ import EventItem from "@/components/EventItem";
 
 import axios from "axios";
 import Chart from "@/components/Chart";
+import { SpinIcon } from "@/assets/SpinIcon";
 
 export async function getServerSideProps(ctx) {
   const name = ctx.query.name;
@@ -187,6 +188,7 @@ ${total} em ${seoDates.month} de ${
 
 export default function FederalDeputy({ data }) {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [currentDate, setCurrentDate] = useState({
     numericMonth: "",
@@ -198,15 +200,22 @@ export default function FederalDeputy({ data }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [openDocument, setOpenDocument] = useState(null);
 
+  useEffect(() => {
+    router.events.on("routeChangeComplete", () => setIsLoading(false));
+  }, [router.events]);
+  useEffect(() => {
+    router.isReady && setIsLoading(false);
+  }, []);
+
   const handleOpenExpense = (document) => {
     onOpen();
     if (openDocument !== document) {
       setOpenDocument(document);
     }
   };
-
   //testing purposes
   const handleDateChange = (newDate) => {
+    setIsLoading(true);
     setCurrentDate(newDate);
   };
 
@@ -369,26 +378,38 @@ export default function FederalDeputy({ data }) {
                   {data?.expenses?.length > 0 && (
                     <>
                       <ol className="relative border-l border-gray-200 dark:border-gray-700 ">
-                        {data.expenses
-                          .sort(
-                            (a, b) =>
-                              new Date(b.dataDocumento) -
-                              new Date(a.dataDocumento)
-                          )
-                          .map((expense) => {
-                            return (
-                              <ExpenseItem
-                                key={expense.id}
-                                value={expense.valorLiquido}
-                                date={expense.dataDocumento}
-                                type={expense.tipoDespesa}
-                                supplier={expense.nomeFornecedor}
-                                supplierId={expense.cnpjCpfFornecedor}
-                                document={expense.urlDocumento}
-                                handleOpen={handleOpenExpense}
-                              />
-                            );
-                          })}
+                        {isLoading ? (
+                          <div
+                            className="flex flex-1 flex-col items-center justify-center mt-8"
+                            role="status"
+                          >
+                            <SpinIcon />
+                            <h2 className="text-1xl font-bold mb-4">
+                              Estamos carregando, aguarde um momento.
+                            </h2>
+                          </div>
+                        ) : (
+                          data.expenses
+                            .sort(
+                              (a, b) =>
+                                new Date(b.dataDocumento) -
+                                new Date(a.dataDocumento)
+                            )
+                            .map((expense) => {
+                              return (
+                                <ExpenseItem
+                                  key={expense.id}
+                                  value={expense.valorLiquido}
+                                  date={expense.dataDocumento}
+                                  type={expense.tipoDespesa}
+                                  supplier={expense.nomeFornecedor}
+                                  supplierId={expense.cnpjCpfFornecedor}
+                                  document={expense.urlDocumento}
+                                  handleOpen={handleOpenExpense}
+                                />
+                              );
+                            })
+                        )}
                       </ol>
                     </>
                   )}
@@ -490,7 +511,6 @@ export default function FederalDeputy({ data }) {
                       </div>
                       <ol className="relative border-l border-gray-200 dark:border-gray-700">
                         {data?.speeches.map((speeche) => {
-
                           return (
                             <EventItem
                               key={speeche.evento_id}
