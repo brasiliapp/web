@@ -113,7 +113,12 @@ export default function Index({ data }) {
             className="text-black-500"
           >
             <User
-              avatarProps={{ radius: "sm", src: user?.urlFoto }}
+              avatarProps={{
+                classNames: { img: "object-fill" },
+                className: "w-11 h-11",
+                radius: "sm",
+                src: user?.urlFoto
+              }}
               description={user.nome}
               name={cellValue}
               size="lg"
@@ -402,7 +407,9 @@ export default function Index({ data }) {
             {(item) => (
               <TableRow key={item.id} onClick={(e) => console.log(e)}>
                 {(columnKey) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  <TableCell className={columnKey === "actions" && "px-0"}>
+                    {renderCell(item, columnKey)}
+                  </TableCell>
                 )}
               </TableRow>
             )}
