@@ -10,12 +10,36 @@ import Head from "next/head";
 
 import { NextUIProvider } from "@nextui-org/react";
 
+import posthog from "posthog-js";
+import { PostHogProvider } from "posthog-js/react";
+
 import { defaultSeoConfig } from "../seoConfig";
 
 import Header from "@/components/Header";
 
+if (typeof window !== "undefined") {
+  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://app.posthog.com",
+    // Enable debug mode in development
+    loaded: (posthog) => {
+      if (process.env.NODE_ENV === "development") posthog.debug();
+    },
+    capture_pageview: true, // Disable automatic pageview capture, as we capture manually
+  });
+}
+
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
+
+  useEffect(() => {
+    // Track page views
+    const handleRouteChange = () => posthog?.capture("$pageview");
+    router.events.on("routeChangeComplete", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, []);
 
   useEffect(() => {
     const handleRouteChange = (url) => {
@@ -30,7 +54,7 @@ function MyApp({ Component, pageProps }) {
   const { title, description, imageUrl, url } = defaultSeoConfig;
 
   return (
-    <>
+    <PostHogProvider client={posthog}>
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -90,7 +114,7 @@ function MyApp({ Component, pageProps }) {
           <Component {...pageProps} />
         </div>
       </NextUIProvider>
-    </>
+    </PostHogProvider>
   );
 }
 
