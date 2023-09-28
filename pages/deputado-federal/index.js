@@ -104,7 +104,7 @@ export default function Index({ data }) {
     switch (columnKey) {
       case "nome":
         return (
-          <Button
+          <a
             href={`/deputado-federal/${slugify(user.nome).concat(
               `-${user.id}`
             )}`}
@@ -113,20 +113,25 @@ export default function Index({ data }) {
             className="text-black-500"
           >
             <User
-              avatarProps={{ radius: "sm", src: user?.urlFoto }}
+              avatarProps={{
+                classNames: { img: "object-fill" },
+                className: "w-11 h-11",
+                radius: "sm",
+                src: user?.urlFoto
+              }}
               description={user.nome}
               name={cellValue}
               size="lg"
             >
               {user.nome}
             </User>
-          </Button>
+          </a>
         );
       case "partido":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <Button
+            <a
               href={`/deputado-federal/${slugify(user.nome).concat(
                 `-${user.id}`
               )}`}
@@ -137,14 +142,14 @@ export default function Index({ data }) {
               <p className="text-bold text-tiny capitalize text-default-400">
                 {user.siglaPartido}
               </p>
-            </Button>
+            </a>
           </div>
         );
       case "estado":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <Button
+            <a
               href={`/deputado-federal/${slugify(user.nome).concat(
                 `-${user.id}`
               )}`}
@@ -155,7 +160,7 @@ export default function Index({ data }) {
               <p className="text-bold text-tiny capitalize text-default-400">
                 {user.siglaUf}
               </p>
-            </Button>
+            </a>
           </div>
         );
 
@@ -402,7 +407,9 @@ export default function Index({ data }) {
             {(item) => (
               <TableRow key={item.id} onClick={(e) => console.log(e)}>
                 {(columnKey) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  <TableCell className={columnKey === "actions" && "px-0"}>
+                    {renderCell(item, columnKey)}
+                  </TableCell>
                 )}
               </TableRow>
             )}
