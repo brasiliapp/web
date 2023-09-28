@@ -297,15 +297,15 @@ export default function FederalDeputy({ data }) {
           </ModalContent>
         </Modal>
         <div className="p-6 sm:p-0">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2">
+          <div className="flex flex-col md:flex-row items-center justify-center">
+            <div className="">
               <Image
                 src={data?.politician?.ultimoStatus?.urlFoto}
                 alt={data?.politician?.ultimoStatus?.nome}
-                className="w-30 h-60 rounded-lg shadow-xl"
+                className="w-full h-full rounded-lg shadow-xl object-contain max-w-[180px] max-h-[240px]"
               />
             </div>
-            <div className="md:w-1/2 md:ml-4 mt-4 md:mt-0">
+            <div className="md:w-1/2 md:ml-4 mt-4 md:mt-0 flex flex-col sm:pr-6 sm:pl-6 flex flex-col sm:pr-6 sm:pl-6">
               <h1 className="text-xl font-semibold">
                 Deputad{getGenderSuffix(data?.politician?.sexo)} Federal{" "}
                 {data?.politician?.ultimoStatus?.nome}
@@ -766,7 +766,7 @@ export default function FederalDeputy({ data }) {
           </Tabs>
         </div>
       </div>
-      <section className="bg-gray-100 py-20 md:mt-3 z-0 text-gray-700 flex flex-col align-center justify-center relative justify-between gap-4 bg-content1 md:rounded-large sm:rounded-none  w-full mb-16">
+      <section className="bg-gray-100 p-10 md:mt-3 z-0 text-gray-700 flex flex-col align-center justify-center relative justify-between gap-4 bg-content1 md:rounded-large sm:rounded-none  w-full mb-16">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4">Acompanhe e Compartilhe</h2>
           <Tooltip content="Siga-nos no Instagram">
