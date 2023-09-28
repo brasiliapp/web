@@ -11,7 +11,7 @@ function getExpenseTypeCodeByName(expenseTypeName, expenseTypes) {
 
 export function calculateTotalByExpenseType(expenses, expenseType) {
   const totalCost = expenses?.reduce((accumulator, expense) => {
-    if(expense.tipoDespesa !== expenseType) {
+    if (expense.tipoDespesa !== expenseType) {
       return accumulator + 0;
     }
 
@@ -28,15 +28,18 @@ export function calculateTotalByExpenseType(expenses, expenseType) {
 }
 
 export default function ExpenseCategories({ expenses, expenseTypes }) {
-  const expensesTypesPresentOnExpensesSet = new Set(expenses.map(expense => expense.tipoDespesa));
-  const expensesTypesPresentOnExpenses = Array.from(expensesTypesPresentOnExpensesSet);
+  const expensesTypesPresentOnExpensesSet = new Set(
+    expenses.map((expense) => expense.tipoDespesa),
+  );
+  const expensesTypesPresentOnExpenses = Array.from(
+    expensesTypesPresentOnExpensesSet,
+  ).sort();
 
   return (
-    <section>
-      <h2>Categoria de gastos</h2>
+    <section className="flex flex-col gap-2">
+      <h2 className="text-bold">Categoria de gastos</h2>
       <ul className="flex flex-row gap-2 overflow-x-scroll">
         {expensesTypesPresentOnExpenses.map((expenseType) => {
-
           const totalExpenseValueByType = calculateTotalByExpenseType(
             expenses,
             expenseType,
@@ -49,9 +52,11 @@ export default function ExpenseCategories({ expenses, expenseTypes }) {
           return (
             <li key={expenseTypeCode}>
               {totalExpenseValueByType > 0 && (
-                <Card>
-                  <CardHeader>{expenseType}</CardHeader>
-                  <CardBody>
+                <Card className="bg-zinc-800 text-white flex flex-col justify-between whitespace-pre-wrap w-80 h-36 p-4">
+                  <CardHeader className="font-bold p-0">
+                    {expenseType}
+                  </CardHeader>
+                  <CardBody className="font-semibold p-0 flex flex-row place-content-start place-items-end">
                     R$ {formatMonetaryValue(totalExpenseValueByType)}
                   </CardBody>
                 </Card>
