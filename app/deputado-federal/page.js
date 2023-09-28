@@ -1,7 +1,14 @@
 import DeputiesTable from "../components/DeputiesTable";
 
+import { defaultSeoConfig } from "@/seoConfig";
+
+const { title, description } = defaultSeoConfig;
+
 export const metadata = {
   openGraph: {
+    url: "/deputado-federal",
+    title,
+    description,
     images: [
       {
         url: "/logo-brasiliapp.png",
