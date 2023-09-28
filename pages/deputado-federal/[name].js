@@ -144,14 +144,6 @@ export async function getServerSideProps(ctx) {
     };
   }
 
-  // Get expenses types
-  const expenseTypes = await api.get("/referencias/deputados/tipoDespesa");
-
-  data = {
-    ...data,
-    expenseTypes: expenseTypes.data.dados,
-  };
-
   const suffix = getGenderSuffix(data?.politician?.sexo);
   const { numericMonth, year } = getCurrentDateInfo(new Date());
   // Get Expenses
@@ -368,7 +360,7 @@ export default function FederalDeputy({ data }) {
                   {(!isLoading && data?.expenses?.length > 0) && (
                     <Fragment>
                       <Divider className="my-5" />
-                      <ExpenseCategories expenses={data.expenses} expenseTypes={data.expenseTypes} isLoading={isLoading} />
+                      <ExpenseCategories expenses={data.expenses} isLoading={isLoading} />
                     </Fragment>
                   )}
                   <Divider className="my-5" />
