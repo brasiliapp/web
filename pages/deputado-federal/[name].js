@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, Fragment } from "react";
 import Head from "next/head";
 import Link from "next/link";
 
@@ -365,9 +365,11 @@ export default function FederalDeputy({ data }) {
                   )}
                   <MonthYear onDateChange={handleDateChange} />
 
-                  <Divider className="my-5" />
-                  {data?.expenses?.length > 0 && (
-                    <ExpenseCategories expenses={data.expenses} expenseTypes={data.expenseTypes} />
+                  {(!isLoading && data?.expenses?.length > 0) && (
+                    <Fragment>
+                      <Divider className="my-5" />
+                      <ExpenseCategories expenses={data.expenses} expenseTypes={data.expenseTypes} isLoading={isLoading} />
+                    </Fragment>
                   )}
                   <Divider className="my-5" />
 
