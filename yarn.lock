@@ -3316,6 +3316,11 @@ faye-websocket@0.11.4:
   dependencies:
     websocket-driver ">=0.5.1"
 
+fflate@^0.4.1:
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/fflate/-/fflate-0.4.8.tgz#f90b82aefbd8ac174213abb338bd7ef848f0f5ae"
+  integrity sha512-FJqqoDBR00Mdj9ppamLa/Y7vxm+PRmNWA67N846RvsoYVMKB4q3y/de5PA7gUmRMYK/8CMz2GDZQmCRN1wBcWA==
+
 file-entry-cache@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/file-entry-cache/-/file-entry-cache-6.0.1.tgz#211b2dd9659cb0394b073e7323ac3c933d522027"
@@ -4541,6 +4546,13 @@ postcss@^8.4.23:
     nanoid "^3.3.6"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
+
+posthog-js@^1.81.1:
+  version "1.81.1"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.81.1.tgz#43f454bf57d0ff649c990e28660bb9a0a292267e"
+  integrity sha512-pQfG9ZGVn3R7Uh1cC/S02trZ6u4TOLs1NhZG3WiNrqMKDA8MJQjZ/PqdkLO0/BeozRBfIbON6pw3xfOIneIclg==
+  dependencies:
+    fflate "^0.4.1"
 
 prelude-ls@^1.2.1:
   version "1.2.1"

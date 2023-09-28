@@ -305,7 +305,7 @@ export default function FederalDeputy({ data }) {
                 className="w-full h-full rounded-lg shadow-xl object-contain max-w-[180px] max-h-[240px]"
               />
             </div>
-            <div className="md:w-1/2 md:ml-4 mt-4 md:mt-0 flex flex-col sm:pr-6 sm:pl-6">
+            <div className="md:w-1/2 md:ml-4 mt-4 md:mt-0 flex flex-col sm:pr-6 sm:pl-6 flex flex-col sm:pr-6 sm:pl-6">
               <h1 className="text-xl font-semibold">
                 Deputad{getGenderSuffix(data?.politician?.sexo)} Federal{" "}
                 {data?.politician?.ultimoStatus?.nome}
