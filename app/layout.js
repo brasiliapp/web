@@ -10,23 +10,28 @@ import { defaultSeoConfig } from "@/seoConfig";
 
 import "./globals.css";
 
-const { title, description } = defaultSeoConfig;
+const { title, description, url } = defaultSeoConfig;
 
 export const metadata = {
   metadataBase: new URL("https://brasiliapp.com.br"),
   title,
   description,
   openGraph: {
+    url,
+    title,
+    description,
     images: [
       {
         url: "/gastos-com-cota-parlamentar.png",
-        title,
-        description,
       },
     ],
   },
   alternates: {
     canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
