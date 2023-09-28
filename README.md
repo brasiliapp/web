@@ -19,6 +19,14 @@ Bem-vindo ao BrasiliApp - um aplicativo que capacita a população a fiscalizar 
 Esse é o projeto do BrasiliApp Web, contruido com NextJs.
 Para rodar o projeto basta clonar o repositório instalar as dependencias e rodar:
 
+### Instale as dependências do projeto
+```bash
+npm install
+# or
+yarn
+```
+
+### Rode o projeto localmente
 ```bash
 npm run dev
 # or
@@ -51,7 +59,7 @@ git checkout -b minha-nova-feature
 ### 4: Sua contribuição
 Agora você pode fazer suas alterações no código. Certifique-se de seguir as diretrizes de codificação e as convenções de estilo do projeto.
 
-### 5: Faça commit das sua aslterações
+### 5: Faça commit das sua alterações
 Agora você pode fazer suas alterações no código. Certifique-se de adicionar uma descrição clara para o commit realizado.
 
 ### 6: Atualize sua Branch
