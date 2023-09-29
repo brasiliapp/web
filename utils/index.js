@@ -93,7 +93,7 @@ export function formatCPFCNPJ(numbers) {
   } else if (numericInput.length === 14) {
     return numericInput.replace(
       /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-      "$1.$2.$3/$4-$5"
+      "$1.$2.$3/$4-$5",
     );
   } else {
     return "Não informado";
@@ -174,34 +174,48 @@ export function findFirstMp4Url(data) {
     }
   }
 
-  return null; 
+  return null;
 }
 
 //this function is needed to be called in order to bypass Camara's media provider (.mp4 url)
 export async function fetchVideos(video_links) {
   video_links.forEach((item) => {
     if (Array.isArray(item.video_links) && item.video_links.length > 0) {
-      item.video_links.forEach(async(videoLink) => {
+      item.video_links.forEach(async (videoLink) => {
         const url = `https://www.camara.leg.br/evento-legislativo/${item.evento_id}/?${videoLink.video_param}&trechosOrador=${item.deputado}&crawl=no`;
 
-        setTimeout(async()=> {
+        setTimeout(async () => {
           await fetch(url)
-          .then((response) => {
-            console.log("tetando pegar o video ===> ". url);
+            .then((response) => {
+              console.log("tetando pegar o video ===> ".url);
 
-            if (!response.ok) {
-              console.log("Network response was not ok ===> ". url);
-            }
-            return response.text();
-          })
-          .then((data) => {
-            console.log("processou ==> ", url);
-          })
-          .catch((error) => {
-            console.log("erro fetching response was not ok ===> ". url);
-          });
-        },249)
+              if (!response.ok) {
+                console.log("Network response was not ok ===> ".url);
+              }
+              return response.text();
+            })
+            .then((data) => {
+              console.log("processou ==> ", url);
+            })
+            .catch((error) => {
+              console.log("erro fetching response was not ok ===> ".url);
+            });
+        }, 249);
       });
     }
   });
+}
+
+export function getCapitalizedPhrase(phrase) {
+  const wordsFromPhrase = phrase.split(" ");
+
+  const capitalizedPhrase = wordsFromPhrase
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+
+  return capitalizedPhrase;
+}
+
+export function removeDotsFromPhrase(phrase) {
+  return phrase.replaceAll(".", "");
 }
