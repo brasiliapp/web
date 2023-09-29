@@ -46,19 +46,19 @@ export default function DeputiesTable({ deputies }) {
     let result = deputies;
 
     if (search) {
-      result = deputies.filter(({ nome }) =>
+      result = result.filter(({ nome }) =>
         nome.toLowerCase().includes(search.toLowerCase())
       );
     }
 
     if (state !== "all") {
-      result = deputies.filter(({ siglaUf }) =>
+      result = result.filter(({ siglaUf }) =>
         Array.from(state).includes(siglaUf)
       );
     }
 
     if (party !== "all") {
-      result = deputies.filter(({ siglaPartido }) =>
+      result = result.filter(({ siglaPartido }) =>
         Array.from(party).includes(siglaPartido)
       );
     }
