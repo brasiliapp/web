@@ -12,7 +12,6 @@ import {
   TableCell,
   Button,
   Chip,
-  User,
 } from "@nextui-org/react";
 
 import Header from "./Header";
