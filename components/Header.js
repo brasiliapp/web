@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 
 import {
@@ -86,10 +87,10 @@ export default function Header() {
                 Junte-se à Transparência: Adote o BrasiliApp
               </ModalHeader> */}
               <ModalBody>
-                <h2 className="text-2xl font-semibold mb-0 mt-4">
+                <h2 className="mt-4 mb-0 text-2xl font-semibold">
                   Juntos pela transparência
                 </h2>
-                <p className="text-gray-700 mb-2">
+                <p className="mb-2 text-gray-700">
                   No Brasil, a política é para o povo, pelo povo e com o
                   dinheiro do povo. É nosso direito e dever garantir que nossos
                   representantes eleitos usem nossos recursos públicos de
@@ -98,10 +99,10 @@ export default function Header() {
                   que coloca o controle em suas mãos.
                 </p>
                 <div className="mb-2">
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="mb-2 text-lg font-semibold">
                     Benefícios do BrasiliApp:
                   </h3>
-                  <ul className="list-disc list-inside text-gray-700 pl-4">
+                  <ul className="pl-4 text-gray-700 list-disc list-inside">
                     <li>
                       Transparência Total: Com o BrasiliApp, você pode acessar
                       facilmente informações detalhadas sobre como seus
@@ -128,10 +129,10 @@ export default function Header() {
                   </ul>
                 </div>
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="mb-2 text-lg font-semibold">
                     Como você pode contribuir:
                   </h3>
-                  <div className="flex w-full flex-col">
+                  <div className="flex flex-col w-full">
                     <Tabs aria-label="apoiando" size="lg">
                       <Tab key="using" title="Utilizando">
                         <Card>
@@ -170,7 +171,7 @@ export default function Header() {
                             vai ajudar com os custos de servidores e hospedagem.
                             Qualquer doação, por menor que seja, faz a
                             diferença. Ajude-nos a fortalecer nossa democracia.
-                            <div className="text-center mt-4">
+                            <div className="mt-4 text-center">
                               <span className="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
                                 Doação Segura
                               </span>
@@ -204,7 +205,7 @@ export default function Header() {
             />
           </Link>
 
-          {/* <p className="font-bold text-inherit ml-3">BrasiliApp</p> */}
+          {/* <p className="ml-3 font-bold text-inherit">BrasiliApp</p> */}
         </NavbarBrand>
       </NavbarContent>
 
@@ -219,7 +220,7 @@ export default function Header() {
               src="/logo-brasiliapp.png"
             />
 
-            <p className="font-bold text-black ml-3">BrasiliApp</p>
+            <p className="ml-3 font-bold text-black">BrasiliApp</p>
           </Link>
         </NavbarBrand>
         <Tooltip content="Ver todos os deputados federais">
@@ -279,31 +280,31 @@ export default function Header() {
             </Button>
           </Tooltip>
         </NavbarItem>
-          <NavbarItem>
-            <Tooltip content="Você pode fazer a diferença">
-              <Button onPress={onOpen} color="danger" variant="flat">
-                Apoie{" "}
-                <svg
-                  aria-hidden="true"
-                  focusable="false"
-                  height="24"
-                  role="presentation"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  className="text-danger animate-heartbeat"
-                  tabIndex="-1"
-                >
-                  <path
-                    d="M12.62 20.81c-.34.12-.9.12-1.24 0C8.48 19.82 2 15.69 2 8.69 2 5.6 4.49 3.1 7.56 3.1c1.82 0 3.43.88 4.44 2.24a5.53 5.53 0 0 1 4.44-2.24C19.51 3.1 22 5.6 22 8.69c0 7-6.48 11.13-9.38 12.12Z"
-                    fill="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                  ></path>
-                </svg>
-              </Button>
-            </Tooltip>
-          </NavbarItem>
+        <NavbarItem>
+          <Tooltip content="Você pode fazer a diferença">
+            <Button onPress={onOpen} color="danger" variant="flat">
+              Apoie{" "}
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                height="24"
+                role="presentation"
+                viewBox="0 0 24 24"
+                width="24"
+                className="text-danger animate-heartbeat"
+                tabIndex="-1"
+              >
+                <path
+                  d="M12.62 20.81c-.34.12-.9.12-1.24 0C8.48 19.82 2 15.69 2 8.69 2 5.6 4.49 3.1 7.56 3.1c1.82 0 3.43.88 4.44 2.24a5.53 5.53 0 0 1 4.44-2.24C19.51 3.1 22 5.6 22 8.69c0 7-6.48 11.13-9.38 12.12Z"
+                  fill="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                ></path>
+              </svg>
+            </Button>
+          </Tooltip>
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarMenu>
