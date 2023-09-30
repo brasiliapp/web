@@ -77,7 +77,7 @@ export async function getServerSideProps(ctx) {
           events: events.data,
         };
       } catch (error) {
-        console.log("fail to get the documents");
+        console.error("fail to get the documents");
       }
     }
 
@@ -169,7 +169,6 @@ ${total} em ${seoDates.month} de ${
 
 export default function FederalDeputy({ data, routeParam }) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
   const [currentDate, setCurrentDate] = useState({
     numericMonth: "",
@@ -177,37 +176,57 @@ export default function FederalDeputy({ data, routeParam }) {
     year: "",
   });
 
-  const [selectTab, setSelectedTab] = useState("gastos");
+  const [selectTab, setSelectedTab] = useState("videos");
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [openDocument, setOpenDocument] = useState(null);
 
+  const [isExpensesLoading, setIsExpensesLoading] = useState(true);
+
+  const [isSpeechesLoading, setIsSpeechesLoading] = useState(true);
+  const [speeches, setSpeeches] = useState([]);
+  const [speechesError, setSpeechesError] = useState(null);
+
+  const [isGabineteLoading, setIsGabineteLoading] = useState(true);
+  const [gabinete, setGabinete] = useState([]);
+  const [gabineteError, setGabineteError] = useState(null);
+
   useEffect(() => {
-    router.events.on("routeChangeComplete", () => setIsLoading(false));
+    router.events.on("routeChangeComplete", () => setIsExpensesLoading(false));
   }, [router.events]);
   useEffect(() => {
-    router.isReady && setIsLoading(false);
+    router.isReady && setIsExpensesLoading(false);
+
+    const requestsPromises = [
+      // get videos
+      axios.get(
+        `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${routeParam}.json`,
+      ),
+      // get gabinete (Adjust CORS policy from R2)
+      axios.get(
+        `https://pub-bfddf9199db94ff8b19b7d931548c52.r2.dev/${routeParam}.json`,
+      ),
+    ];
 
     (async () => {
-      //get videos
-      try {
-        const speeches = await axios.get(
-          `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${routeParam}.json`,
-        );
-        console.log("SPEECHES", speeches.data);
-        // data = { ...data, speeches: speeches?.data ? speeches?.data : [] };
-      } catch (error) {
-        console.log("fail to get videos");
+      const [speechesResponse, gabineteResponse] =
+        await Promise.allSettled(requestsPromises);
+
+      setIsSpeechesLoading(false);
+      setIsGabineteLoading(false);
+
+      if (speechesResponse.status === "rejected") {
+        setSpeechesError(speechesResponse.reason);
+        console.error("failed to get speeches videos");
+      } else {
+        setSpeeches(speechesResponse.value.data);
       }
 
-      // get gabinete (Adjust CORS policy from R2)
-      try {
-        const gabinete = await axios.get(
-          `https://pub-bfddf9199db94ff8b19b7d931548c52.r2.dev/${routeParam}.json`,
-        );
-        // data = { ...data, gabinete: gabinete?.data ? gabinete?.data : [] };
-      } catch (error) {
-        console.log("fail to get gabinete");
+      if (gabineteResponse.status === "rejected") {
+        setGabineteError(gabineteResponse.reason);
+        console.error("failed to get cabinet data");
+      } else {
+        setGabinete(gabineteResponse.data);
       }
     })();
   }, [routeParam]);
@@ -220,7 +239,7 @@ export default function FederalDeputy({ data, routeParam }) {
   };
   //testing purposes
   const handleDateChange = (newDate) => {
-    setIsLoading(true);
+    setIsExpensesLoading(true);
     setCurrentDate(newDate);
   };
 
@@ -361,12 +380,12 @@ export default function FederalDeputy({ data, routeParam }) {
                   )}
                   <MonthYear onDateChange={handleDateChange} />
 
-                  {!isLoading && data?.expenses?.length > 0 && (
+                  {!isExpensesLoading && data?.expenses?.length > 0 && (
                     <Fragment>
                       <Divider className="my-5" />
                       <ExpenseCategories
                         expenses={data.expenses}
-                        isLoading={isLoading}
+                        isLoading={isExpensesLoading}
                       />
                     </Fragment>
                   )}
@@ -393,7 +412,7 @@ export default function FederalDeputy({ data, routeParam }) {
                   {data?.expenses?.length > 0 && (
                     <>
                       <ol className="relative border-l border-gray-200 dark:border-gray-700 ">
-                        {isLoading ? (
+                        {isExpensesLoading ? (
                           <div
                             className="flex flex-1 flex-col items-center justify-center mt-8"
                             role="status"
@@ -462,42 +481,64 @@ export default function FederalDeputy({ data, routeParam }) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-2 ">
-                      {data?.gabinete?.active_secretaries?.map((secretary) => {
-                        return (
-                          <>
-                            <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Nome:{" "}
-                              </span>
-                              {secretary?.name}
-                            </div>
-                            <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Grupo funcional:
-                              </span>
-                              {secretary?.group}
-                            </div>
-                            <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Cargo:{" "}
-                              </span>
-                              {secretary?.role}
-                            </div>
-                            <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Período de exercício:{" "}
-                              </span>{" "}
-                              {secretary?.period}
-                            </div>
-                            <div className="col-span-1 p-2 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Remuneração mensal:{" "}
-                              </span>
-                              Em breve
-                            </div>
-                          </>
-                        );
-                      })}
+                      {isGabineteLoading ? (
+                        <div
+                          className="flex flex-1 flex-col items-center justify-center"
+                          role="status"
+                        >
+                          <SpinIcon />
+                          <h2 className="text-1xl font-bold mb-4">
+                            Buscando dados do gabinete do parlamentar, aguarde um momento.
+                          </h2>
+                        </div>
+                      ) : (
+                        <Fragment>
+                          {gabineteError && (
+                            <small className="text-start">
+                              Houve um erro ao buscar dados do gabinete
+                            </small>
+                          )}
+                          {!gabineteError &&
+                            gabinete.active_secretaries?.map(
+                              (secretary, index) => {
+                                return (
+                                  <Fragment key={index}>
+                                    <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
+                                      <span className="md:hidden font-bold">
+                                        Nome:{" "}
+                                      </span>
+                                      {secretary?.name}
+                                    </div>
+                                    <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
+                                      <span className="md:hidden font-bold">
+                                        Grupo funcional:
+                                      </span>
+                                      {secretary?.group}
+                                    </div>
+                                    <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
+                                      <span className="md:hidden font-bold">
+                                        Cargo:{" "}
+                                      </span>
+                                      {secretary?.role}
+                                    </div>
+                                    <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
+                                      <span className="md:hidden font-bold">
+                                        Período de exercício:{" "}
+                                      </span>{" "}
+                                      {secretary?.period}
+                                    </div>
+                                    <div className="col-span-1 p-2 border-gray-300">
+                                      <span className="md:hidden font-bold">
+                                        Remuneração mensal:{" "}
+                                      </span>
+                                      Em breve
+                                    </div>
+                                  </Fragment>
+                                );
+                              },
+                            )}
+                        </Fragment>
+                      )}
                     </div>
                   </div>
                 </CardBody>
@@ -506,41 +547,60 @@ export default function FederalDeputy({ data, routeParam }) {
             <Tab key="videos" title="Videos">
               <Card>
                 <CardBody>
-                  {data?.speeches?.length === 0 && (
-                    <>
-                      <small className="text-start">
-                        Não existe vídeos para esse parlamentar
-                      </small>
-                    </>
+                  {speechesError && (
+                    <small className="text-start">
+                      Houve um erro ao buscar os vídeos para esse parlamentar
+                    </small>
                   )}
-                  {data?.speeches?.length > 0 && (
-                    <>
-                      <div
-                        className="bg-gray-100 mb-5 border-l-4 border-gray-300 text-dark-700 p-4 rounded-lg"
-                        role="alert"
-                      >
-                        Os vídeos abaixo foram capturados pela página do
-                        deputado no site da câmara dos deputados, se não
-                        conseguir visualizar aqui clique no link que redireciona
-                        para a página da câmara.
-                      </div>
-                      <ol className="relative border-l border-gray-200 dark:border-gray-700">
-                        {data?.speeches.map((speeche) => {
-                          return (
-                            <EventItem
-                              key={speeche.evento_id}
-                              id={speeche.evento_id}
-                              title={speeche.event_title}
-                              date={speeche.date}
-                              time={speeche.time}
-                              place={speeche.place}
-                              videos={speeche.video_links}
-                              name={data?.politician?.ultimoStatus?.nome}
-                            />
-                          );
-                        })}
-                      </ol>
-                    </>
+                  {isSpeechesLoading ? (
+                    <div
+                      className="flex flex-1 flex-col items-center justify-center"
+                      role="status"
+                    >
+                      <SpinIcon />
+                      <h2 className="text-1xl font-bold mb-4">
+                        Buscando videos, aguarde um momento.
+                      </h2>
+                    </div>
+                  ) : (
+                    <Fragment>
+                      {!speechesError && speeches.length === 0 && (
+                        <>
+                          <small className="text-start">
+                            Não existe vídeos para esse parlamentar
+                          </small>
+                        </>
+                      )}
+                      {!speechesError && speeches.length > 0 && (
+                        <>
+                          <div
+                            className="bg-gray-100 mb-5 border-l-4 border-gray-300 text-dark-700 p-4 rounded-lg"
+                            role="alert"
+                          >
+                            Os vídeos abaixo foram capturados pela página do
+                            deputado no site da câmara dos deputados, se não
+                            conseguir visualizar aqui clique no link que
+                            redireciona para a página da câmara.
+                          </div>
+                          <ol className="relative border-l border-gray-200 dark:border-gray-700">
+                            {speeches.map((speeche) => {
+                              return (
+                                <EventItem
+                                  key={speeche.evento_id}
+                                  id={speeche.evento_id}
+                                  title={speeche.event_title}
+                                  date={speeche.date}
+                                  time={speeche.time}
+                                  place={speeche.place}
+                                  videos={speeche.video_links}
+                                  name={data?.politician?.ultimoStatus?.nome}
+                                />
+                              );
+                            })}
+                          </ol>
+                        </>
+                      )}
+                    </Fragment>
                   )}
                 </CardBody>
               </Card>
