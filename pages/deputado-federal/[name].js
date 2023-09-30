@@ -60,26 +60,6 @@ export async function getServerSideProps(ctx) {
     const politician = await api.get(`/deputados/${id}`);
     const experience = await api.get(`/deputados/${id}/ocupacoes`);
 
-    //get videos
-    try {
-      const speeches = await axios.get(
-        `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${name}.json`,
-      );
-      data = { ...data, speeches: speeches?.data ? speeches?.data : [] };
-    } catch (error) {
-      console.log("fail to get videos");
-    }
-
-    //get gabinete
-    try {
-      const gabinete = await axios.get(
-        `https://pub-bfddf9199db94ff8b19b7d931e548c52.r2.dev/${name}.json`,
-      );
-      data = { ...data, gabinete: gabinete?.data ? gabinete?.data : [] };
-    } catch (error) {
-      console.log("fail to get gabinete");
-    }
-
     if (data?.speeches?.length > 0) {
       fetchVideos(data?.speeches);
       try {
@@ -184,10 +164,10 @@ ${total} em ${seoDates.month} de ${
     title: title,
   };
 
-  return { props: { data } };
+  return { props: { data, routeParam: name } };
 }
 
-export default function FederalDeputy({ data }) {
+export default function FederalDeputy({ data, routeParam }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -196,6 +176,7 @@ export default function FederalDeputy({ data }) {
     fullMonth: "",
     year: "",
   });
+
   const [selectTab, setSelectedTab] = useState("gastos");
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -206,7 +187,30 @@ export default function FederalDeputy({ data }) {
   }, [router.events]);
   useEffect(() => {
     router.isReady && setIsLoading(false);
-  }, []);
+
+    (async () => {
+      //get videos
+      try {
+        const speeches = await axios.get(
+          `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${routeParam}.json`,
+        );
+        console.log("SPEECHES", speeches.data);
+        // data = { ...data, speeches: speeches?.data ? speeches?.data : [] };
+      } catch (error) {
+        console.log("fail to get videos");
+      }
+
+      // get gabinete (Adjust CORS policy from R2)
+      try {
+        const gabinete = await axios.get(
+          `https://pub-bfddf9199db94ff8b19b7d931548c52.r2.dev/${routeParam}.json`,
+        );
+        // data = { ...data, gabinete: gabinete?.data ? gabinete?.data : [] };
+      } catch (error) {
+        console.log("fail to get gabinete");
+      }
+    })();
+  }, [routeParam]);
 
   const handleOpenExpense = (document) => {
     onOpen();
@@ -357,10 +361,13 @@ export default function FederalDeputy({ data }) {
                   )}
                   <MonthYear onDateChange={handleDateChange} />
 
-                  {(!isLoading && data?.expenses?.length > 0) && (
+                  {!isLoading && data?.expenses?.length > 0 && (
                     <Fragment>
                       <Divider className="my-5" />
-                      <ExpenseCategories expenses={data.expenses} isLoading={isLoading} />
+                      <ExpenseCategories
+                        expenses={data.expenses}
+                        isLoading={isLoading}
+                      />
                     </Fragment>
                   )}
                   <Divider className="my-5" />
