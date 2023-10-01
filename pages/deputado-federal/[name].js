@@ -381,7 +381,7 @@ export default function FederalDeputy({ data }) {
                     </div>
                   )}
 
-                  {data?.expenses?.length === 0 && (
+                  {data?.expenses?.length === 0 && !isLoading && (
                     <small className="text-center">
                       Sem gastos do parlamentar nesse mês
                     </small>
