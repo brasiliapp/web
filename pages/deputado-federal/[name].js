@@ -176,7 +176,7 @@ export default function FederalDeputy({ data, routeParam }) {
     year: "",
   });
 
-  const [selectTab, setSelectedTab] = useState("videos");
+  const [selectTab, setSelectedTab] = useState("despesas");
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [openDocument, setOpenDocument] = useState(null);
@@ -201,19 +201,20 @@ export default function FederalDeputy({ data, routeParam }) {
       // get videos
       axios.get(
         `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${routeParam}.json`,
-      ),
+      ).finally(() => {
+        setIsSpeechesLoading(false);
+      }),
       // get gabinete (Adjust CORS policy from R2)
       axios.get(
         `https://pub-bfddf9199db94ff8b19b7d931548c52.r2.dev/${routeParam}.json`,
-      ),
+      ).finally(() => {
+        setIsGabineteLoading(false);
+      }),
     ];
 
     (async () => {
       const [speechesResponse, gabineteResponse] =
         await Promise.allSettled(requestsPromises);
-
-      setIsSpeechesLoading(false);
-      setIsGabineteLoading(false);
 
       if (speechesResponse.status === "rejected") {
         setSpeechesError(speechesResponse.reason);
