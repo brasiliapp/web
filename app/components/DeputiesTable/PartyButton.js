@@ -32,6 +32,7 @@ export default function PartyButton({ party, setParty }) {
         closeOnSelect={false}
         selectedKeys={party}
         defaultSelectedKeys="all"
+        className="overflow-y-auto max-h-96"
         selectionMode="single"
         onSelectionChange={(e) => {
           if (e.currentKey === "all") {
