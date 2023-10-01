@@ -171,31 +171,20 @@ export default function FederalDeputy({ data, routeParam }) {
   useEffect(() => {
     router.events.on("routeChangeComplete", () => setIsExpensesLoading(false));
   }, [router.events]);
+
   useEffect(() => {
     router.isReady && setIsExpensesLoading(false);
-
-    const requestsPromises = [
-      // get videos
-      axios
-        .get(
-          `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${routeParam}.json`,
-        )
-        .finally(() => {
-          setIsSpeechesLoading(false);
-        }),
-      // get gabinete (Adjust CORS policy from R2)
-      axios
-        .get(
-          `https://pub-bfddf9199db94ff8b19b7d931548c52.r2.dev/${routeParam}.json`,
-        )
-        .finally(() => {
-          setIsGabineteLoading(false);
-        }),
-    ];
+    const speechesAndGabineteRequestsPromises =
+      getSpeechesAndGabineteRequestsPromises(
+        routeParam,
+        setIsSpeechesLoading,
+        setIsGabineteLoading,
+      );
 
     (async () => {
-      const [speechesResponse, gabineteResponse] =
-        await Promise.allSettled(requestsPromises);
+      const [speechesResponse, gabineteResponse] = await Promise.allSettled(
+        speechesAndGabineteRequestsPromises,
+      );
 
       if (speechesResponse.status === "rejected") {
         setSpeechesError(speechesResponse.reason);
@@ -211,7 +200,11 @@ export default function FederalDeputy({ data, routeParam }) {
         setGabinete(gabineteResponse.data);
       }
     })();
-  }, [routeParam]);
+
+    return () => {
+      abortReqController.abort();
+    };
+  }, [routeParam, router.isReady]);
 
   const handleOpenExpense = (document) => {
     onOpen();
@@ -411,10 +404,10 @@ export default function FederalDeputy({ data, routeParam }) {
                                 new Date(b.dataDocumento) -
                                 new Date(a.dataDocumento),
                             )
-                            .map((expense) => {
+                            .map((expense, index) => {
                               return (
                                 <ExpenseItem
-                                  key={expense.id}
+                                  key={index}
                                   value={expense.valorLiquido}
                                   date={expense.dataDocumento}
                                   type={expense.tipoDespesa}
@@ -902,4 +895,36 @@ export default function FederalDeputy({ data, routeParam }) {
       </section>
     </>
   );
+}
+
+function getSpeechesAndGabineteRequestsPromises(
+  routeParam,
+  setIsSpeechesLoading,
+  setIsGabineteLoading,
+) {
+  const abortReqController = new AbortController();
+  const abortReqSignal = abortReqController.signal;
+
+  const requestsPromises = [
+    // get videos
+    axios
+      .get(
+        `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${routeParam}.json`,
+        { signal: abortReqSignal },
+      )
+      .finally(() => {
+        setIsSpeechesLoading(false);
+      }),
+    // get gabinete (Adjust CORS policy from R2)
+    axios
+      .get(
+        `https://pub-bfddf9199db94ff8b19b7d931548c52.r2.dev/${routeParam}.json`,
+        { sginal: abortReqSignal },
+      )
+      .finally(() => {
+        setIsGabineteLoading(false);
+      }),
+  ];
+
+  return requestsPromises;
 }
