@@ -28,8 +28,6 @@ import {
   formatCPFCNPJ,
   formatDate,
   formatPhoneNumberDf,
-  fetchVideos,
-  propertyValuesArray,
 } from "../../utils";
 
 import { defaultSeoConfig } from "../../seoConfig";
@@ -59,27 +57,6 @@ export async function getServerSideProps(ctx) {
   if (name) {
     const politician = await api.get(`/deputados/${id}`);
     const experience = await api.get(`/deputados/${id}/ocupacoes`);
-
-    if (data?.speeches?.length > 0) {
-      fetchVideos(data?.speeches);
-      try {
-        let eventsArray = propertyValuesArray(
-          data?.speeches || [],
-          "evento_id",
-          "number",
-        );
-        eventsArray = eventsArray.map((id) => `id=${id}`).join("&");
-        const events = await api.get(
-          `/eventos?${eventsArray}&ordem=ASC&ordenarPor=dataHoraInicio`,
-        );
-        data = {
-          ...data,
-          events: events.data,
-        };
-      } catch (error) {
-        console.error("fail to get the documents");
-      }
-    }
 
     let monthlyGabineteMoney = null;
     const monthNumber = (new Date().getMonth() + 1).toString().padStart(2, "0");
@@ -199,17 +176,21 @@ export default function FederalDeputy({ data, routeParam }) {
 
     const requestsPromises = [
       // get videos
-      axios.get(
-        `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${routeParam}.json`,
-      ).finally(() => {
-        setIsSpeechesLoading(false);
-      }),
+      axios
+        .get(
+          `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${routeParam}.json`,
+        )
+        .finally(() => {
+          setIsSpeechesLoading(false);
+        }),
       // get gabinete (Adjust CORS policy from R2)
-      axios.get(
-        `https://pub-bfddf9199db94ff8b19b7d931548c52.r2.dev/${routeParam}.json`,
-      ).finally(() => {
-        setIsGabineteLoading(false);
-      }),
+      axios
+        .get(
+          `https://pub-bfddf9199db94ff8b19b7d931548c52.r2.dev/${routeParam}.json`,
+        )
+        .finally(() => {
+          setIsGabineteLoading(false);
+        }),
     ];
 
     (async () => {
@@ -489,7 +470,8 @@ export default function FederalDeputy({ data, routeParam }) {
                         >
                           <SpinIcon />
                           <h2 className="text-1xl font-bold mb-4">
-                            Buscando dados do gabinete do parlamentar, aguarde um momento.
+                            Buscando dados do gabinete do parlamentar, aguarde
+                            um momento.
                           </h2>
                         </div>
                       ) : (

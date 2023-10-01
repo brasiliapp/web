@@ -142,27 +142,6 @@ export function checkNullObject(obj) {
   return true;
 }
 
-export function propertyValuesArray(arr, propertyKey, type) {
-  if (!Array.isArray(arr)) {
-    throw new TypeError("First argument must be an array");
-  }
-  if (typeof propertyKey !== "string") {
-    throw new TypeError("Second argument must be a string");
-  }
-
-  return arr
-    .map((obj) => {
-      if (obj && typeof obj === "object" && obj.hasOwnProperty(propertyKey)) {
-        if (type === "number") {
-          return Number(obj[propertyKey]);
-        }
-        return String(obj[propertyKey]);
-      }
-      return null;
-    })
-    .filter((value) => value !== null);
-}
-
 export function findFirstMp4Url(data) {
   for (let i = 0; i < data.length; i++) {
     const videoLinks = data[i].video_links;
@@ -175,35 +154,6 @@ export function findFirstMp4Url(data) {
   }
 
   return null;
-}
-
-//this function is needed to be called in order to bypass Camara's media provider (.mp4 url)
-export async function fetchVideos(video_links) {
-  video_links.forEach((item) => {
-    if (Array.isArray(item.video_links) && item.video_links.length > 0) {
-      item.video_links.forEach(async (videoLink) => {
-        const url = `https://www.camara.leg.br/evento-legislativo/${item.evento_id}/?${videoLink.video_param}&trechosOrador=${item.deputado}&crawl=no`;
-
-        setTimeout(async () => {
-          await fetch(url)
-            .then((response) => {
-              console.log("tetando pegar o video ===> ".url);
-
-              if (!response.ok) {
-                console.log("Network response was not ok ===> ".url);
-              }
-              return response.text();
-            })
-            .then((data) => {
-              console.log("processou ==> ", url);
-            })
-            .catch((error) => {
-              console.log("erro fetching response was not ok ===> ".url);
-            });
-        }, 249);
-      });
-    }
-  });
 }
 
 export function getCapitalizedPhrase(phrase) {
