@@ -1,6 +1,6 @@
-import { React, useState, useEffect, Fragment } from "react";
-import Head from "next/head";
-import Link from "next/link";
+import { React, useState, useEffect, Fragment } from 'react'
+import Head from 'next/head'
+import Link from 'next/link'
 
 import {
   Tabs,
@@ -15,9 +15,9 @@ import {
   useDisclosure,
   Tooltip,
   Button,
-} from "@nextui-org/react";
+} from '@nextui-org/react'
 
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router'
 
 import {
   calculateAge,
@@ -30,89 +30,89 @@ import {
   formatPhoneNumberDf,
   fetchVideos,
   propertyValuesArray,
-} from "../../utils";
+} from '../../utils'
 
-import { defaultSeoConfig } from "../../seoConfig";
+import { defaultSeoConfig } from '../../seoConfig'
 
-import api from "@/services/api";
+import api from '@/services/api'
 
-import MonthYear from "@/components/MonthYear";
-import ExpenseCategories from "@/components/ExpenseCategories";
-import ExpenseItem from "@/components/ExpenseItem";
-import ExperienceItem from "@/components/ExperienceItem";
-import EventItem from "@/components/EventItem";
+import MonthYear from '@/components/MonthYear'
+import ExpenseCategories from '@/components/ExpenseCategories'
+import ExpenseItem from '@/components/ExpenseItem'
+import ExperienceItem from '@/components/ExperienceItem'
+import EventItem from '@/components/EventItem'
 
-import axios from "axios";
-import Chart from "@/components/Chart";
-import { SpinIcon } from "@/assets/SpinIcon";
+import axios from 'axios'
+import Chart from '@/components/Chart'
+import { SpinIcon } from '@/assets/SpinIcon'
 
 export async function getServerSideProps(ctx) {
-  const name = ctx.query.name;
-  const yearUrl = ctx.query.ano;
-  const monthUrl = ctx.query.mes;
+  const name = ctx.query.name
+  const yearUrl = ctx.query.ano
+  const monthUrl = ctx.query.mes
 
-  let id = name.split("-");
-  id = id[id.length - 1];
+  let id = name.split('-')
+  id = id[id.length - 1]
 
-  let data = null;
+  let data = null
 
   if (name) {
-    const politician = await api.get(`/deputados/${id}`);
-    const experience = await api.get(`/deputados/${id}/ocupacoes`);
+    const politician = await api.get(`/deputados/${id}`)
+    const experience = await api.get(`/deputados/${id}/ocupacoes`)
 
     //get videos
     try {
       const speeches = await axios.get(
-        `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${name}.json`,
-      );
-      data = { ...data, speeches: speeches?.data ? speeches?.data : [] };
+        `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${name}.json`
+      )
+      data = { ...data, speeches: speeches?.data ? speeches?.data : [] }
     } catch (error) {
-      console.log("fail to get videos");
+      console.log('fail to get videos')
     }
 
     //get gabinete
     try {
       const gabinete = await axios.get(
-        `https://pub-bfddf9199db94ff8b19b7d931e548c52.r2.dev/${name}.json`,
-      );
-      data = { ...data, gabinete: gabinete?.data ? gabinete?.data : [] };
+        `https://pub-bfddf9199db94ff8b19b7d931e548c52.r2.dev/${name}.json`
+      )
+      data = { ...data, gabinete: gabinete?.data ? gabinete?.data : [] }
     } catch (error) {
-      console.log("fail to get gabinete");
+      console.log('fail to get gabinete')
     }
 
     if (data?.speeches?.length > 0) {
-      fetchVideos(data?.speeches);
+      fetchVideos(data?.speeches)
       try {
         let eventsArray = propertyValuesArray(
           data?.speeches || [],
-          "evento_id",
-          "number",
-        );
-        eventsArray = eventsArray.map((id) => `id=${id}`).join("&");
+          'evento_id',
+          'number'
+        )
+        eventsArray = eventsArray.map((id) => `id=${id}`).join('&')
         const events = await api.get(
-          `/eventos?${eventsArray}&ordem=ASC&ordenarPor=dataHoraInicio`,
-        );
+          `/eventos?${eventsArray}&ordem=ASC&ordenarPor=dataHoraInicio`
+        )
         data = {
           ...data,
           events: events.data,
-        };
+        }
       } catch (error) {
-        console.log("fail to get the documents");
+        console.log('fail to get the documents')
       }
     }
 
-    let monthlyGabineteMoney = null;
-    const monthNumber = (new Date().getMonth() + 1).toString().padStart(2, "0");
+    let monthlyGabineteMoney = null
+    const monthNumber = (new Date().getMonth() + 1).toString().padStart(2, '0')
 
     if (monthUrl) {
       monthlyGabineteMoney =
         data?.gabinete?.montly_expenses.find(
-          (item) => item.month === monthUrl,
-        ) || null;
+          (item) => item.month === monthUrl
+        ) || null
     } else {
       monthlyGabineteMoney = data?.gabinete?.montly_expenses.find(
-        (item) => item.month === monthNumber,
-      );
+        (item) => item.month === monthNumber
+      )
     }
 
     data = {
@@ -120,105 +120,105 @@ export async function getServerSideProps(ctx) {
       politician: politician.data.dados,
       experiences: experience.data.dados,
       monthlyGabineteMoney: monthlyGabineteMoney || null,
-    };
+    }
   }
 
   /** Improve SEO titles and descriptions method, make it external as well */
 
-  let seoDates = {};
+  let seoDates = {}
   if (!yearUrl && !monthUrl) {
-    const currentDatesForSeo = getCurrentDateInfo();
+    const currentDatesForSeo = getCurrentDateInfo()
     seoDates = {
       month: currentDatesForSeo.longMonth,
       year: currentDatesForSeo.year,
-    };
+    }
   } else {
-    const oldDatesForSeo = new Date(`${monthUrl}-30-${yearUrl}`);
-    const oldDateMonth = oldDatesForSeo.toLocaleString("pt-BR", {
-      month: "long",
-    });
+    const oldDatesForSeo = new Date(`${monthUrl}-30-${yearUrl}`)
+    const oldDateMonth = oldDatesForSeo.toLocaleString('pt-BR', {
+      month: 'long',
+    })
 
     seoDates = {
       month: oldDateMonth,
       year: yearUrl,
-    };
+    }
   }
 
-  const suffix = getGenderSuffix(data?.politician?.sexo);
-  const { numericMonth, year } = getCurrentDateInfo(new Date());
+  const suffix = getGenderSuffix(data?.politician?.sexo)
+  const { numericMonth, year } = getCurrentDateInfo(new Date())
   // Get Expenses
   if (!!yearUrl && !!monthUrl) {
     const expenses = await api.get(
-      `/deputados/${id}/despesas?idLegislatura=57&ano=${yearUrl}&mes=${monthUrl}`,
-    );
+      `/deputados/${id}/despesas?idLegislatura=57&ano=${yearUrl}&mes=${monthUrl}`
+    )
     data = {
       ...data,
       expenses: expenses.data.dados,
-    };
+    }
   } else {
     const singleMonthExpenses = await api.get(
-      `/deputados/${id}/despesas?idLegislatura=57&ano=${year}&mes=${numericMonth}`,
-    );
+      `/deputados/${id}/despesas?idLegislatura=57&ano=${year}&mes=${numericMonth}`
+    )
     data = {
       ...data,
       expenses: singleMonthExpenses.data.dados || null,
-    };
+    }
   }
 
   const total = formatMonetaryValue(
-    calculateTotal(data.expenses, "valorLiquido"),
-  );
+    calculateTotal(data.expenses, 'valorLiquido')
+  )
 
   const title = `Gastos d${suffix} deputad${suffix} Federal
-${data?.politician?.ultimoStatus?.nome} você confere aqui no BrasiliApp`;
+${data?.politician?.ultimoStatus?.nome} você confere aqui no BrasiliApp`
 
   const description = `${suffix.toUpperCase()} deputad${suffix} Federal
 ${data?.politician?.ultimoStatus?.nome} gastou 
 ${total} em ${seoDates.month} de ${
     seoDates.year
-  }, confira aqui como ele usou a cota parlamentar`;
+  }, confira aqui como ele usou a cota parlamentar`
 
   data = {
     ...data,
     description: description,
     title: title,
-  };
+  }
 
-  return { props: { data } };
+  return { props: { data } }
 }
 
 export default function FederalDeputy({ data }) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
 
   const [currentDate, setCurrentDate] = useState({
-    numericMonth: "",
-    fullMonth: "",
-    year: "",
-  });
-  const [selectTab, setSelectedTab] = useState("gastos");
+    numericMonth: '',
+    fullMonth: '',
+    year: '',
+  })
+  const [selectTab, setSelectedTab] = useState('gastos')
 
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [openDocument, setOpenDocument] = useState(null);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure()
+  const [openDocument, setOpenDocument] = useState(null)
 
   useEffect(() => {
-    router.events.on("routeChangeComplete", () => setIsLoading(false));
-  }, [router.events]);
+    router.events.on('routeChangeComplete', () => setIsLoading(false))
+  }, [router.events])
   useEffect(() => {
-    router.isReady && setIsLoading(false);
-  }, []);
+    router.isReady && setIsLoading(false)
+  }, [])
 
   const handleOpenExpense = (document) => {
-    onOpen();
+    onOpen()
     if (openDocument !== document) {
-      setOpenDocument(document);
+      setOpenDocument(document)
     }
-  };
+  }
   //testing purposes
   const handleDateChange = (newDate) => {
-    setIsLoading(true);
-    setCurrentDate(newDate);
-  };
+    setIsLoading(true)
+    setCurrentDate(newDate)
+  }
 
   return (
     <>
@@ -308,20 +308,20 @@ export default function FederalDeputy({ data }) {
             </div>
             <div className="md:w-1/2 md:ml-4 mt-4 md:mt-0 flex flex-col sm:pr-6 sm:pl-6 flex flex-col sm:pr-6 sm:pl-6">
               <h1 className="text-xl font-semibold">
-                Deputad{getGenderSuffix(data?.politician?.sexo)} Federal{" "}
+                Deputad{getGenderSuffix(data?.politician?.sexo)} Federal{' '}
                 {data?.politician?.ultimoStatus?.nome}
               </h1>
               <p className="text-gray-600">
                 {data?.politician?.nomeCivil} é um
-                {data?.politician?.sexo === "F" ? "a" : ""} deputad
+                {data?.politician?.sexo === 'F' ? 'a' : ''} deputad
                 {getGenderSuffix(data?.politician?.sexo)} brasileir
-                {getGenderSuffix(data?.politician?.sexo)} pelo partido{" "}
+                {getGenderSuffix(data?.politician?.sexo)} pelo partido{' '}
                 {data?.politician?.ultimoStatus?.siglaPartido}/
-                {data?.politician?.ultimoStatus?.siglaUf}, tem{" "}
+                {data?.politician?.ultimoStatus?.siglaUf}, tem{' '}
                 {calculateAge(data?.politician?.dataNascimento)} anos e nasceu
                 na cidade de {data?.politician?.municipioNascimento}/
                 {data?.politician?.ufNascimento}.
-              </p>{" "}
+              </p>{' '}
             </div>
           </div>
         </div>
@@ -332,7 +332,6 @@ export default function FederalDeputy({ data }) {
             aria-label="Options"
             selectedKey={selectTab}
             onSelectionChange={setSelectedTab}
-            disabledKeys={["gabinete"]}
           >
             <Tab key="despesas" title="Despesas" className="">
               <Card>
@@ -343,7 +342,7 @@ export default function FederalDeputy({ data }) {
                       <div className="flex items-center justify-center ">
                         <p className="text-4xl font-bold">
                           {formatMonetaryValue(
-                            calculateTotal(data.expenses, "valorLiquido"),
+                            calculateTotal(data.expenses, 'valorLiquido')
                           )}
                         </p>
                       </div>
@@ -357,10 +356,13 @@ export default function FederalDeputy({ data }) {
                   )}
                   <MonthYear onDateChange={handleDateChange} />
 
-                  {(!isLoading && data?.expenses?.length > 0) && (
+                  {!isLoading && data?.expenses?.length > 0 && (
                     <Fragment>
                       <Divider className="my-5" />
-                      <ExpenseCategories expenses={data.expenses} isLoading={isLoading} />
+                      <ExpenseCategories
+                        expenses={data.expenses}
+                        isLoading={isLoading}
+                      />
                     </Fragment>
                   )}
                   <Divider className="my-5" />
@@ -370,9 +372,9 @@ export default function FederalDeputy({ data }) {
                       className="bg-yellow-100 mb-5 border-l-4 border-yellow-100 text-yellow-700 p-4 rounded-lg"
                       role="alert"
                     >
-                      Além da cota parlamentar foi utilizado{" "}
-                      <i>R$ {data?.monthlyGabineteMoney.expense_amount}</i> de{" "}
-                      <i> R$ {data?.monthlyGabineteMoney.available_amount}</i>{" "}
+                      Além da cota parlamentar foi utilizado{' '}
+                      <i>R$ {data?.monthlyGabineteMoney.expense_amount}</i> de{' '}
+                      <i> R$ {data?.monthlyGabineteMoney.available_amount}</i>{' '}
                       disponível da verba de gabinete.
                     </div>
                   )}
@@ -401,7 +403,7 @@ export default function FederalDeputy({ data }) {
                             .sort(
                               (a, b) =>
                                 new Date(b.dataDocumento) -
-                                new Date(a.dataDocumento),
+                                new Date(a.dataDocumento)
                             )
                             .map((expense) => {
                               return (
@@ -415,7 +417,7 @@ export default function FederalDeputy({ data }) {
                                   document={expense.urlDocumento}
                                   handleOpen={handleOpenExpense}
                                 />
-                              );
+                              )
                             })
                         )}
                       </ol>
@@ -424,7 +426,7 @@ export default function FederalDeputy({ data }) {
                 </CardBody>
               </Card>
             </Tab>
-            <Tab key="gabinete" title="Gabinete (em breve)" className="">
+            <Tab key="gabinete" title="Gabinete" className="">
               <Card>
                 <CardBody className="px-8">
                   <p>
@@ -436,14 +438,14 @@ export default function FederalDeputy({ data }) {
                     categoria de servidores comissionados.
                   </p>
                   <p className="mt-3">
-                    O valor dessa verba é de R$ 111.675,59 por deputado,
+                    O valor dessa verba é de R$ 118.376,13 por deputado,
                     destina-se a pagar os salários de até 25 secretários
                     parlamentares que trabalham para o mandato, em Brasília ou
                     nos estados.
                   </p>
                   <Chart data={data?.gabinete?.montly_expenses} />
 
-                  <h3>Conheça a equipe de secretários</h3>
+                  <h3 className="my-4">Conheça a equipe de secretários</h3>
 
                   <div className="w-full p-4 bg-white shadow-lg rounded-lg overflow-x-auto">
                     <div className="hidden md:grid grid-cols-5 gap-4 mb-4 font-bold">
@@ -460,7 +462,7 @@ export default function FederalDeputy({ data }) {
                           <>
                             <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
                               <span className="md:hidden font-bold">
-                                Nome:{" "}
+                                Nome:{' '}
                               </span>
                               {secretary?.name}
                             </div>
@@ -472,24 +474,24 @@ export default function FederalDeputy({ data }) {
                             </div>
                             <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
                               <span className="md:hidden font-bold">
-                                Cargo:{" "}
+                                Cargo:{' '}
                               </span>
                               {secretary?.role}
                             </div>
                             <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
                               <span className="md:hidden font-bold">
-                                Período de exercício:{" "}
-                              </span>{" "}
+                                Período de exercício:{' '}
+                              </span>{' '}
                               {secretary?.period}
                             </div>
                             <div className="col-span-1 p-2 border-gray-300">
                               <span className="md:hidden font-bold">
-                                Remuneração mensal:{" "}
+                                Remuneração mensal:{' '}
                               </span>
                               Em breve
                             </div>
                           </>
-                        );
+                        )
                       })}
                     </div>
                   </div>
@@ -530,7 +532,7 @@ export default function FederalDeputy({ data }) {
                               videos={speeche.video_links}
                               name={data?.politician?.ultimoStatus?.nome}
                             />
-                          );
+                          )
                         })}
                       </ol>
                     </>
@@ -636,7 +638,7 @@ export default function FederalDeputy({ data }) {
                               start={experience.anoInicio}
                               end={experience.anoFim}
                             />
-                          );
+                          )
                         })}
                       </ol>
                     </>
@@ -668,10 +670,10 @@ export default function FederalDeputy({ data }) {
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400 whitespace-normal">
                             {data?.politician?.ultimoStatus?.gabinete?.andar}°
-                            andar, Sala{" "}
+                            andar, Sala{' '}
                             {data?.politician?.ultimoStatus?.gabinete?.nome} do
-                            prédio{" "}
-                            {data?.politician?.ultimoStatus?.gabinete?.predio}{" "}
+                            prédio{' '}
+                            {data?.politician?.ultimoStatus?.gabinete?.predio}{' '}
                             na Praça dos Poderes, Brasilia/DF
                           </p>
                         </div>
@@ -688,7 +690,7 @@ export default function FederalDeputy({ data }) {
                               <p className="text-sm text-gray-500 truncate dark:text-gray-400">
                                 {formatPhoneNumberDf(
                                   data?.politician?.ultimoStatus?.gabinete
-                                    ?.telefone,
+                                    ?.telefone
                                 )}
                               </p>
                             </div>
@@ -697,8 +699,8 @@ export default function FederalDeputy({ data }) {
                               href={`tel:+55${formatPhoneNumberDf(
                                 data?.politician?.ultimoStatus?.gabinete?.telefone.replace(
                                   /\D/g,
-                                  "",
-                                ),
+                                  ''
+                                )
                               )}`}
                               className="flex items-center text-sm bg-success-500 hover:bg-success-700 text-white font py-2 px-4 rounded"
                               title={`Ligue agora para ${data?.politician?.nomeCivil}`}
@@ -733,7 +735,7 @@ export default function FederalDeputy({ data }) {
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
                             {data?.politician?.urlWebsite
                               ? data?.politician?.urlWebsite
-                              : "Não informado"}
+                              : 'Não informado'}
                           </p>
                         </div>
                       </div>
@@ -753,16 +755,16 @@ export default function FederalDeputy({ data }) {
                           {data?.politician?.redeSocial?.map((profile) => {
                             return (
                               <a
-                                key={profile.split("?")[0]}
-                                href={profile.split("?")[0]}
+                                key={profile.split('?')[0]}
+                                href={profile.split('?')[0]}
                                 rel="nofollow"
                                 target="_blank"
                                 className="text-sm text-gray-500 underline truncate dark:text-gray-400"
                                 title={`Acesse o perfil: ${data?.politician?.nomeCivil}`}
                               >
-                                {profile.split("?")[0]}
+                                {profile.split('?')[0]}
                               </a>
-                            );
+                            )
                           })}
                         </div>
                       </div>
@@ -851,5 +853,5 @@ export default function FederalDeputy({ data }) {
         </div>
       </section>
     </>
-  );
+  )
 }
