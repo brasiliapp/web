@@ -31,7 +31,7 @@ export default function StatesButton({ state, setState }) {
         disallowEmptySelection={true}
         closeOnSelect={false}
         selectedKeys={state}
-        className="overflow-y-auto max-h-96 "
+        className="overflow-y-auto max-h-96"
         defaultSelectedKeys="all"
         selectionMode="single"
         onSelectionChange={(e) => {
