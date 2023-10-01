@@ -35,6 +35,9 @@ const monthNamesBR = {
 };
 
 function Chart({ data }) {
+  // sort data by month
+  data.sort((a, b) => a.month - b.month);
+
   const months = data?.map((item) => monthNamesBR[item.month]);
   const availableAmounts = data.map((item) =>
     parseFloat(item.available_amount.replace(",", ".").replace(".", ""))
