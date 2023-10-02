@@ -7,14 +7,15 @@ const MonthYear = ({ onDateChange, total }) => {
   const { ano, mes } = router.query;
 
   const [displayedDate, setDisplayedDate] = useState(null);
-
+  console.log("displayedDate", displayedDate);
   const currentDate = new Date();
 
   useEffect(() => {
     if (!ano && !mes && displayedDate === null) {
       setDisplayedDate(currentDate);
     } else {
-      setDisplayedDate(new Date(`${mes}-01-${ano}`));
+      const monthIndex = mes - 1; // jan: 0 / dec: 11
+      setDisplayedDate(new Date(ano, monthIndex));
     }
   }, []);
 
@@ -35,7 +36,7 @@ const MonthYear = ({ onDateChange, total }) => {
     router.push(
       `/deputado-federal/${router.query.name}?mes=${(newDate.getMonth() + 1)
         .toString()
-        .padStart(2, "0")}&ano=${newDate.getFullYear()}`
+        .padStart(2, "0")}&ano=${newDate.getFullYear()}`,
     );
 
     return onDateChange({
