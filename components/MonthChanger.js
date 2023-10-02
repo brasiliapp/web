@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { Button } from "@nextui-org/react";
 
-const MonthYear = ({ dateChangeHandler }) => {
+const MonthChanger = ({ changeDateHandler }) => {
   const router = useRouter();
   const { ano: routerQueryYear, mes: routerQueryMonth } = router.query;
 
   const [displayDate, setDisplayDate] = useState(
-    getInitialDisplayDate(routerQueryYear, routerQueryMonth),
+    getInitialDisplayDate(routerQueryYear, routerQueryMonth)
   );
 
   const changeDateMonthByOffset = (offset) => {
@@ -18,10 +18,10 @@ const MonthYear = ({ dateChangeHandler }) => {
     router.push(
       `/deputado-federal/${router.query.name}?mes=${(newDate.getMonth() + 1)
         .toString()
-        .padStart(2, "0")}&ano=${newDate.getFullYear()}`,
+        .padStart(2, "0")}&ano=${newDate.getFullYear()}`
     );
 
-    dateChangeHandler({
+    changeDateHandler({
       numericMonth: (newDate.getMonth() + 1).toString().padStart(2, "0"),
       fullMonth: newDate.toLocaleString("default", { month: "long" }),
       year: newDate.getFullYear(),
@@ -96,8 +96,7 @@ function getIsDisplayDateWithinOneMonthFromNow(displayDate) {
   displayDatePlusOneMonth.setMonth(displayDatePlusOneMonth.getMonth() + 1);
 
   const currentDate = new Date();
-
   return displayDatePlusOneMonth <= currentDate;
 }
 
-export default MonthYear;
+export default MonthChanger;
