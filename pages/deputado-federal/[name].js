@@ -333,7 +333,6 @@ export default function FederalDeputy({ data }) {
             aria-label="Options"
             selectedKey={selectTab}
             onSelectionChange={setSelectedTab}
-            disabledKeys={["gabinete"]}
           >
             <Tab key="despesas" title="Despesas" className="">
               <Card>
@@ -433,7 +432,7 @@ export default function FederalDeputy({ data }) {
                 </CardBody>
               </Card>
             </Tab>
-            <Tab key="gabinete" title="Gabinete (em breve)" className="">
+            <Tab key="gabinete" title="Gabinete" className="">
               <Card>
                 <CardBody className="px-8">
                   <p>
@@ -445,14 +444,14 @@ export default function FederalDeputy({ data }) {
                     categoria de servidores comissionados.
                   </p>
                   <p className="mt-3">
-                    O valor dessa verba é de R$ 111.675,59 por deputado,
+                    O valor dessa verba é de R$ 118.376,13 por deputado,
                     destina-se a pagar os salários de até 25 secretários
                     parlamentares que trabalham para o mandato, em Brasília ou
                     nos estados.
                   </p>
                   <Chart data={data?.gabinete?.montly_expenses} />
 
-                  <h3>Conheça a equipe de secretários</h3>
+                  <h3 className="my-4">Conheça a equipe de secretários</h3>
 
                   <div className="w-full p-4 bg-white shadow-lg rounded-lg overflow-x-auto">
                     <div className="hidden md:grid grid-cols-5 gap-4 mb-4 font-bold">
