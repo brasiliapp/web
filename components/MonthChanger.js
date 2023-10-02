@@ -57,7 +57,7 @@ const MonthChanger = ({ changeDateHandler }) => {
         </u>
       </div>
 
-      {getIsDisplayDateWithinOneMonthFromNow(displayDate) && (
+      {getIsDisplayDateUpToSameMonthOfNow(displayDate) && (
         <Button
           size="sm"
           className=""
@@ -91,7 +91,7 @@ function getInitialDisplayDate(year, month) {
   return new Date(year, monthIndex);
 }
 
-function getIsDisplayDateWithinOneMonthFromNow(displayDate) {
+function getIsDisplayDateUpToSameMonthOfNow(displayDate) {
   const displayDatePlusOneMonth = new Date(displayDate);
   displayDatePlusOneMonth.setMonth(displayDatePlusOneMonth.getMonth() + 1);
 
