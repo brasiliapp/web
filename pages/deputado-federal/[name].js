@@ -37,7 +37,7 @@ import { defaultSeoConfig } from "../../seoConfig";
 
 import api from "@/services/api";
 
-import MonthYear from "@/components/MonthYear";
+import MonthChanger from "@/components/MonthChanger";
 import ExpenseCategories from "@/components/ExpenseCategories";
 import ExpenseItem from "@/components/ExpenseItem";
 import ExperienceItem from "@/components/ExperienceItem";
@@ -355,7 +355,7 @@ export default function FederalDeputy({ data }) {
                       </p>
                     </div>
                   )}
-                  <MonthYear onDateChange={handleDateChange} />
+                  <MonthChanger changeDateHandler={handleDateChange} />
 
                   {!isLoading && data?.expenses?.length > 0 && (
                     <Fragment>
@@ -395,7 +395,6 @@ export default function FederalDeputy({ data }) {
                         color="default"
                         aria-label="Loading..."
                         size="lg"
-
                       />
 
                       <h2 className="text-1xl mb-4">
