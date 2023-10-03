@@ -30,12 +30,9 @@ import {
   formatDate,
   formatPhoneNumberDf,
   fetchVideos,
-  propertyValuesArray,
 } from "../../utils";
 
 import { defaultSeoConfig } from "../../seoConfig";
-
-import api from "@/services/api";
 
 import MonthChanger from "@/components/MonthChanger";
 import ExpenseCategories from "@/components/ExpenseCategories";
@@ -43,9 +40,8 @@ import ExpenseItem from "@/components/ExpenseItem";
 import ExperienceItem from "@/components/ExperienceItem";
 import EventItem from "@/components/EventItem";
 
-import axios from "axios";
+import { GetFederalDeputyDataService } from "@/services";
 import Chart from "@/components/Chart";
-import { SpinIcon } from "@/assets/SpinIcon";
 
 export async function getServerSideProps(ctx) {
   const name = ctx.query.name;
@@ -56,50 +52,32 @@ export async function getServerSideProps(ctx) {
   id = id[id.length - 1];
 
   let data = null;
+  const getFederalDeputyDataService = new GetFederalDeputyDataService();
 
   if (name) {
-    const politician = await api.get(`/deputados/${id}`);
-    const experience = await api.get(`/deputados/${id}/ocupacoes`);
+    const politician = await getFederalDeputyDataService.fetchBaseData(id);
+    const experience =
+      await getFederalDeputyDataService.fetchWorkExperience(id);
 
     //get videos
     try {
-      const speeches = await axios.get(
-        `https://pub-ef5d1d80d62c44a1a00e2d05a2d5b85c.r2.dev/${name}.json`
-      );
-      data = { ...data, speeches: speeches?.data ? speeches?.data : [] };
+      const speeches =
+        await getFederalDeputyDataService.fetchSpeechesVideos(name);
+      data = { ...data, speeches: speeches ? speeches.data : [] };
     } catch (error) {
-      console.log("fail to get videos");
+      console.error("fail to get videos", error);
     }
 
     //get gabinete
     try {
-      const gabinete = await axios.get(
-        `https://pub-bfddf9199db94ff8b19b7d931e548c52.r2.dev/${name}.json`
-      );
-      data = { ...data, gabinete: gabinete?.data ? gabinete?.data : [] };
+      const gabinete = await getFederalDeputyDataService.fetchCabinetData(name);
+      data = { ...data, gabinete: gabinete ? gabinete.data : [] };
     } catch (error) {
-      console.log("fail to get gabinete");
+      console.error("fail to get gabinete", error);
     }
 
     if (data?.speeches?.length > 0) {
       fetchVideos(data?.speeches);
-      try {
-        let eventsArray = propertyValuesArray(
-          data?.speeches || [],
-          "evento_id",
-          "number"
-        );
-        eventsArray = eventsArray.map((id) => `id=${id}`).join("&");
-        const events = await api.get(
-          `/eventos?${eventsArray}&ordem=ASC&ordenarPor=dataHoraInicio`
-        );
-        data = {
-          ...data,
-          events: events.data,
-        };
-      } catch (error) {
-        console.log("fail to get the documents");
-      }
     }
 
     let monthlyGabineteMoney = null;
@@ -108,18 +86,18 @@ export async function getServerSideProps(ctx) {
     if (monthUrl) {
       monthlyGabineteMoney =
         data?.gabinete?.montly_expenses.find(
-          (item) => item.month === monthUrl
+          (item) => item.month === monthUrl,
         ) || null;
     } else {
       monthlyGabineteMoney = data?.gabinete?.montly_expenses.find(
-        (item) => item.month === monthNumber
+        (item) => item.month === monthNumber,
       );
     }
 
     data = {
       ...data,
-      politician: politician.data.dados,
-      experiences: experience.data.dados,
+      politician: politician.data,
+      experiences: experience.data,
       monthlyGabineteMoney: monthlyGabineteMoney || null,
     };
   }
@@ -149,25 +127,29 @@ export async function getServerSideProps(ctx) {
   const { numericMonth, year } = getCurrentDateInfo(new Date());
   // Get Expenses
   if (!!yearUrl && !!monthUrl) {
-    const expenses = await api.get(
-      `/deputados/${id}/despesas?idLegislatura=57&ano=${yearUrl}&mes=${monthUrl}`
+    const expenses = await getFederalDeputyDataService.fetchExpenses(
+      id,
+      yearUrl,
+      monthUrl,
     );
     data = {
       ...data,
-      expenses: expenses.data.dados,
+      expenses: expenses.data,
     };
   } else {
-    const singleMonthExpenses = await api.get(
-      `/deputados/${id}/despesas?idLegislatura=57&ano=${year}&mes=${numericMonth}`
+    const singleMonthExpenses = await getFederalDeputyDataService.fetchExpenses(
+      id,
+      year,
+      numericMonth,
     );
     data = {
       ...data,
-      expenses: singleMonthExpenses.data.dados || null,
+      expenses: singleMonthExpenses.data || null,
     };
   }
 
   const total = formatMonetaryValue(
-    calculateTotal(data.expenses, "valorLiquido")
+    calculateTotal(data.expenses, "valorLiquido"),
   );
 
   const title = `Gastos d${suffix} deputad${suffix} Federal
@@ -343,7 +325,7 @@ export default function FederalDeputy({ data }) {
                       <div className="flex items-center justify-center ">
                         <p className="text-4xl font-bold">
                           {formatMonetaryValue(
-                            calculateTotal(data.expenses, "valorLiquido")
+                            calculateTotal(data.expenses, "valorLiquido"),
                           )}
                         </p>
                       </div>
@@ -410,7 +392,7 @@ export default function FederalDeputy({ data }) {
                           .sort(
                             (a, b) =>
                               new Date(b.dataDocumento) -
-                              new Date(a.dataDocumento)
+                              new Date(a.dataDocumento),
                           )
                           .map((expense) => {
                             return (
@@ -696,7 +678,7 @@ export default function FederalDeputy({ data }) {
                               <p className="text-sm text-gray-500 truncate dark:text-gray-400">
                                 {formatPhoneNumberDf(
                                   data?.politician?.ultimoStatus?.gabinete
-                                    ?.telefone
+                                    ?.telefone,
                                 )}
                               </p>
                             </div>
@@ -705,8 +687,8 @@ export default function FederalDeputy({ data }) {
                               href={`tel:+55${formatPhoneNumberDf(
                                 data?.politician?.ultimoStatus?.gabinete?.telefone.replace(
                                   /\D/g,
-                                  ""
-                                )
+                                  "",
+                                ),
                               )}`}
                               className="flex items-center text-sm bg-success-500 hover:bg-success-700 text-white font py-2 px-4 rounded"
                               title={`Ligue agora para ${data?.politician?.nomeCivil}`}
