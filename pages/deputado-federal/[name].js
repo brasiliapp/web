@@ -15,7 +15,6 @@ import {
   useDisclosure,
   Tooltip,
   Button,
-  CircularProgress,
 } from "@nextui-org/react";
 
 import { useRouter } from "next/router";
@@ -33,14 +32,11 @@ import {
 
 import { defaultSeoConfig } from "../../seoConfig";
 
-import MonthChanger from "@/components/MonthChanger";
-import ExpenseCategories from "@/components/ExpenseCategories";
-import ExpenseItem from "@/components/ExpenseItem";
+import { tabs } from "@/components/deputado-federal/[name]";
 import ExperienceItem from "@/components/ExperienceItem";
 import EventItem from "@/components/EventItem";
 
 import { GetFederalDeputyDataService } from "@/services";
-import Chart from "@/components/Chart";
 
 export async function getServerSideProps(ctx) {
   const {
@@ -79,7 +75,7 @@ export async function getServerSideProps(ctx) {
   }
 
   const monthlyCabinetExpenses = cabinetData?.data.montly_expenses.find(
-    (item) => item.month === queryParamMonthInMM,
+    (item) => queryParamMonthInMM === item.month,
   );
 
   const total = formatMonetaryValue(
@@ -130,7 +126,7 @@ export default function FederalDeputy({ data }) {
   }, [router.events]);
   useEffect(() => {
     router.isReady && setIsLoading(false);
-  }, []);
+  }, [router.isReady]);
 
   const handleOpenExpense = (document) => {
     onOpen();
@@ -199,7 +195,7 @@ export default function FederalDeputy({ data }) {
         />
       </Head>
 
-      <div className="mt-3 z-0 flex flex-col relative justify-between rounded-large w-full">
+      <main className="mt-3 z-0 flex flex-col relative justify-between rounded-large w-full">
         <Modal
           isOpen={isOpen}
           placement="center"
@@ -224,7 +220,7 @@ export default function FederalDeputy({ data }) {
           </ModalContent>
         </Modal>
         <div className="p-6 sm:p-0">
-          <div className="flex flex-col md:flex-row items-center justify-center">
+          <section className="flex flex-col md:flex-row items-center justify-center">
             <div className="">
               <Image
                 src={data?.federalDeputyBaseInfo?.ultimoStatus?.urlFoto}
@@ -251,7 +247,7 @@ export default function FederalDeputy({ data }) {
                 {data?.federalDeputyBaseInfo?.ufNascimento}.
               </p>{" "}
             </div>
-          </div>
+          </section>
         </div>
         <Divider className="my-5" />
 
@@ -264,186 +260,24 @@ export default function FederalDeputy({ data }) {
             <Tab key="despesas" title="Despesas" className="">
               <Card>
                 <CardBody className="px-0 md:px-6 sm:px-4">
-                  {data?.expenses?.length > 0 ? (
-                    <>
-                      <p className="mx-4 text-lg text-center mt-5">Gastou</p>
-                      <div className="flex items-center justify-center ">
-                        <p className="text-4xl font-bold">
-                          {formatMonetaryValue(
-                            calculateTotal(data.expenses, "valorLiquido"),
-                          )}
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex items-center justify-center mt-5">
-                      <p className="text-4xl font-bold">
-                        {formatMonetaryValue(0)}
-                      </p>
-                    </div>
-                  )}
-                  <MonthChanger changeDateHandler={handleDateChange} />
-
-                  {!isLoading && data?.expenses?.length > 0 && (
-                    <Fragment>
-                      <Divider className="my-5" />
-                      <ExpenseCategories
-                        expenses={data.expenses}
-                        isLoading={isLoading}
-                      />
-                    </Fragment>
-                  )}
-                  <Divider className="my-5" />
-
-                  {data?.federalDeputyMonthlyCabinetExpenses && (
-                    <div
-                      className="bg-yellow-100 mb-5 border-l-4 border-yellow-100 text-yellow-700 p-4 rounded-lg"
-                      role="alert"
-                    >
-                      Além da cota parlamentar foi utilizado{" "}
-                      <i>
-                        R${" "}
-                        {
-                          data?.federalDeputyMonthlyCabinetExpenses
-                            .expense_amount
-                        }
-                      </i>{" "}
-                      de{" "}
-                      <i>
-                        {" "}
-                        R${" "}
-                        {
-                          data?.federalDeputyMonthlyCabinetExpenses
-                            .available_amount
-                        }
-                      </i>{" "}
-                      disponível da verba de gabinete.
-                    </div>
-                  )}
-
-                  {data?.expenses?.length === 0 && !isLoading && (
-                    <small className="text-center">
-                      Sem gastos do parlamentar nesse mês
-                    </small>
-                  )}
-
-                  {isLoading && (
-                    <div
-                      className="flex flex-1 flex-col items-center justify-center mt-8"
-                      role="status"
-                    >
-                      <CircularProgress
-                        color="default"
-                        aria-label="Loading..."
-                        size="lg"
-                      />
-
-                      <h2 className="text-1xl mb-4">
-                        Estamos buscando despesas para o mês...
-                      </h2>
-                    </div>
-                  )}
-
-                  {data?.expenses?.length > 0 && !isLoading && (
-                    <>
-                      <ol className="relative border-l border-gray-200 dark:border-gray-700 ">
-                        {data.expenses
-                          .sort(
-                            (a, b) =>
-                              new Date(b.dataDocumento) -
-                              new Date(a.dataDocumento),
-                          )
-                          .map((expense) => {
-                            return (
-                              <ExpenseItem
-                                key={expense.id}
-                                value={expense.valorLiquido}
-                                date={expense.dataDocumento}
-                                type={expense.tipoDespesa}
-                                supplier={expense.nomeFornecedor}
-                                supplierId={expense.cnpjCpfFornecedor}
-                                document={expense.urlDocumento}
-                                handleOpen={handleOpenExpense}
-                              />
-                            );
-                          })}
-                      </ol>
-                    </>
-                  )}
+                  <tabs.Expenses
+                    expenses={data.expenses}
+                    monthlyCabinetExpenses={
+                      data.federalDeputyMonthlyCabinetExpenses
+                    }
+                    changeDateHandler={handleDateChange}
+                    isLoading={isLoading}
+                    openExpenseHandler={handleOpenExpense}
+                  />
                 </CardBody>
               </Card>
             </Tab>
             <Tab key="gabinete" title="Gabinete" className="">
               <Card>
-                <CardBody className="px-8">
-                  <p>
-                    A verba de gabinete é o valor utilizado como limite para a
-                    contratação da equipe de secretários parlamentares dos
-                    gabinetes, pessoas que não necessitam ter vínculo com o
-                    serviço público e que são escolhidas diretamente pelo
-                    deputado para exercerem as atribuições previstas para essa
-                    categoria de servidores comissionados.
-                  </p>
-                  <p className="mt-3">
-                    O valor dessa verba é de R$ 118.376,13 por deputado,
-                    destina-se a pagar os salários de até 25 secretários
-                    parlamentares que trabalham para o mandato, em Brasília ou
-                    nos estados.
-                  </p>
-                  <Chart data={data?.cabinetData?.montly_expenses} />
-
-                  <h3 className="my-4">Conheça a equipe de secretários</h3>
-
-                  <div className="w-full p-4 bg-white shadow-lg rounded-lg overflow-x-auto">
-                    <div className="hidden md:grid grid-cols-5 gap-4 mb-4 font-bold">
-                      <div className="p-2">Nome</div>
-                      <div className="p-2">Grupo funcional</div>
-                      <div className="p-2">Cargo</div>
-                      <div className="p-2">Período de exercício</div>
-                      <div className="p-2">Remuneração mensal</div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-2 ">
-                      {data?.cabinetData?.active_secretaries?.map(
-                        (secretary, index) => {
-                          return (
-                            <Fragment key={index}>
-                              <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                                <span className="md:hidden font-bold">
-                                  Nome:{" "}
-                                </span>
-                                {secretary?.name}
-                              </div>
-                              <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                                <span className="md:hidden font-bold">
-                                  Grupo funcional:
-                                </span>
-                                {secretary?.group}
-                              </div>
-                              <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                                <span className="md:hidden font-bold">
-                                  Cargo:{" "}
-                                </span>
-                                {secretary?.role}
-                              </div>
-                              <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                                <span className="md:hidden font-bold">
-                                  Período de exercício:{" "}
-                                </span>{" "}
-                                {secretary?.period}
-                              </div>
-                              <div className="col-span-1 p-2 border-gray-300">
-                                <span className="md:hidden font-bold">
-                                  Remuneração mensal:{" "}
-                                </span>
-                                Em breve
-                              </div>
-                            </Fragment>
-                          );
-                        },
-                      )}
-                    </div>
-                  </div>
+                <CardBody>
+                  <tabs.Cabinet
+                    cabinetData={data.cabinetData}
+                  />
                 </CardBody>
               </Card>
             </Tab>
@@ -742,8 +576,8 @@ export default function FederalDeputy({ data }) {
             </Tab>
           </Tabs>
         </div>
-      </div>
-      <section className="bg-gray-100 p-10 md:mt-3 z-0 text-gray-700 flex flex-col align-center justify-center relative justify-between gap-4 bg-content1 md:rounded-large sm:rounded-none  w-full mb-16">
+      </main>
+      <footer className="bg-gray-100 p-10 md:mt-3 z-0 text-gray-700 flex flex-col align-center justify-center relative justify-between gap-4 bg-content1 md:rounded-large sm:rounded-none  w-full mb-16">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4">Acompanhe e Compartilhe</h2>
           <Tooltip content="Siga-nos no Instagram">
@@ -818,7 +652,7 @@ export default function FederalDeputy({ data }) {
             </div>
           </Link>
         </div>
-      </section>
+      </footer>
     </>
   );
 }

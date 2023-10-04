@@ -5,7 +5,7 @@ import {
   formatDate,
   formatCPFCNPJ,
   identifyPerson,
-} from "../utils";
+} from "@/utils";
 
 export default function ExpenseItem({
   value,
