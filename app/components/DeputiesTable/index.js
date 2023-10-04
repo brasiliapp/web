@@ -17,7 +17,7 @@ import {
 import Header from "./Header";
 
 import { columns } from "@/utils/data";
-import { slugify } from "@/utils";
+import { getCurrentDateInfo, slugify } from "@/utils";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "nome",
@@ -28,7 +28,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 const headerColumns = columns.filter((column) =>
-  INITIAL_VISIBLE_COLUMNS.includes(column.uid)
+  INITIAL_VISIBLE_COLUMNS.includes(column.uid),
 );
 
 const statusColorMap = {
@@ -47,19 +47,19 @@ export default function DeputiesTable({ deputies }) {
 
     if (search) {
       result = result.filter(({ nome }) =>
-        nome.toLowerCase().includes(search.toLowerCase())
+        nome.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
     if (state !== "all") {
       result = result.filter(({ siglaUf }) =>
-        Array.from(state).includes(siglaUf)
+        Array.from(state).includes(siglaUf),
       );
     }
 
     if (party !== "all") {
       result = result.filter(({ siglaPartido }) =>
-        Array.from(party).includes(siglaPartido)
+        Array.from(party).includes(siglaPartido),
       );
     }
 
@@ -74,8 +74,12 @@ export default function DeputiesTable({ deputies }) {
 
   const renderCell = useCallback((deputy, columnKey) => {
     const cellValue = deputy[columnKey];
+    const { numericMonth, year } = getCurrentDateInfo();
+    const queryParams = `mes=${numericMonth}&ano=${year}`;
 
-    const navigateTo = `/deputado-federal/${slugify(deputy.nome)}-${deputy.id}`;
+    const navigateTo = `/deputado-federal/${slugify(deputy.nome)}-${
+      deputy.id
+    }?${queryParams}`;
 
     switch (columnKey) {
       case "nome":

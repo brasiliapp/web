@@ -22,7 +22,6 @@ import { useRouter } from "next/router";
 
 import {
   calculateAge,
-  getCurrentDateInfo,
   getGenderSuffix,
   calculateTotal,
   formatMonetaryValue,
@@ -44,127 +43,69 @@ import { GetFederalDeputyDataService } from "@/services";
 import Chart from "@/components/Chart";
 
 export async function getServerSideProps(ctx) {
-  const name = ctx.query.name;
-  const yearUrl = ctx.query.ano;
-  const monthUrl = ctx.query.mes;
+  const {
+    name: queryParamNameAndID,
+    ano: queryParamYearInYYYY,
+    mes: queryParamMonthInMM,
+  } = ctx.query;
 
-  let id = name.split("-");
-  id = id[id.length - 1];
-
-  let data = null;
   const getFederalDeputyDataService = new GetFederalDeputyDataService();
 
-  if (name) {
-    const politician = await getFederalDeputyDataService.fetchBaseData(id);
-    const experience =
-      await getFederalDeputyDataService.fetchWorkExperience(id);
-
-    //get videos
-    try {
-      const speeches =
-        await getFederalDeputyDataService.fetchSpeechesVideos(name);
-      data = { ...data, speeches: speeches ? speeches.data : [] };
-    } catch (error) {
-      console.error("fail to get videos", error);
-    }
-
-    //get gabinete
-    try {
-      const gabinete = await getFederalDeputyDataService.fetchCabinetData(name);
-      data = { ...data, gabinete: gabinete ? gabinete.data : [] };
-    } catch (error) {
-      console.error("fail to get gabinete", error);
-    }
-
-    if (data?.speeches?.length > 0) {
-      fetchVideos(data?.speeches);
-    }
-
-    let monthlyGabineteMoney = null;
-    const monthNumber = (new Date().getMonth() + 1).toString().padStart(2, "0");
-
-    if (monthUrl) {
-      monthlyGabineteMoney =
-        data?.gabinete?.montly_expenses.find(
-          (item) => item.month === monthUrl,
-        ) || null;
-    } else {
-      monthlyGabineteMoney = data?.gabinete?.montly_expenses.find(
-        (item) => item.month === monthNumber,
-      );
-    }
-
-    data = {
-      ...data,
-      politician: politician.data,
-      experiences: experience.data,
-      monthlyGabineteMoney: monthlyGabineteMoney || null,
-    };
-  }
-
-  /** Improve SEO titles and descriptions method, make it external as well */
-
-  let seoDates = {};
-  if (!yearUrl && !monthUrl) {
-    const currentDatesForSeo = getCurrentDateInfo();
-    seoDates = {
-      month: currentDatesForSeo.longMonth,
-      year: currentDatesForSeo.year,
-    };
-  } else {
-    const oldDatesForSeo = new Date(`${monthUrl}-30-${yearUrl}`);
-    const oldDateMonth = oldDatesForSeo.toLocaleString("pt-BR", {
-      month: "long",
-    });
-
-    seoDates = {
-      month: oldDateMonth,
-      year: yearUrl,
-    };
-  }
-
-  const suffix = getGenderSuffix(data?.politician?.sexo);
-  const { numericMonth, year } = getCurrentDateInfo(new Date());
-  // Get Expenses
-  if (!!yearUrl && !!monthUrl) {
-    const expenses = await getFederalDeputyDataService.fetchExpenses(
-      id,
-      yearUrl,
-      monthUrl,
-    );
-    data = {
-      ...data,
-      expenses: expenses.data,
-    };
-  } else {
-    const singleMonthExpenses = await getFederalDeputyDataService.fetchExpenses(
-      id,
-      year,
-      numericMonth,
-    );
-    data = {
-      ...data,
-      expenses: singleMonthExpenses.data || null,
-    };
-  }
-
-  const total = formatMonetaryValue(
-    calculateTotal(data.expenses, "valorLiquido"),
+  const id = queryParamNameAndID.split("-").at(-1);
+  const baseInfo = await getFederalDeputyDataService.fetchBaseData(id);
+  const workHistory = await getFederalDeputyDataService.fetchWorkHistory(id);
+  const monthExpenses = await getFederalDeputyDataService.fetchExpenses(
+    id,
+    queryParamYearInYYYY,
+    queryParamMonthInMM,
   );
 
-  const title = `Gastos d${suffix} deputad${suffix} Federal
-${data?.politician?.ultimoStatus?.nome} você confere aqui no BrasiliApp`;
+  let speechesData, cabinetData;
+  try {
+    speechesData =
+      await getFederalDeputyDataService.fetchSpeechesData(queryParamNameAndID);
+    if (speechesData?.length > 0) {
+      fetchVideos(data?.speechesData);
+    }
+  } catch (error) {
+    console.error("fail to get videos", error);
+  }
 
-  const description = `${suffix.toUpperCase()} deputad${suffix} Federal
-${data?.politician?.ultimoStatus?.nome} gastou 
-${total} em ${seoDates.month} de ${
-    seoDates.year
-  }, confira aqui como ele usou a cota parlamentar`;
+  try {
+    cabinetData =
+      await getFederalDeputyDataService.fetchCabinetData(queryParamNameAndID);
+  } catch (error) {
+    console.error("fail to get cabinetData", error);
+  }
 
-  data = {
-    ...data,
-    description: description,
-    title: title,
+  const monthlyCabinetExpenses = cabinetData?.data.montly_expenses.find(
+    (item) => item.month === queryParamMonthInMM,
+  );
+
+  const total = formatMonetaryValue(
+    calculateTotal(monthExpenses.data, "valorLiquido"),
+  );
+
+  /** Improve SEO titles and descriptions method, make it external as well */
+  const seoDates = getDateForSEO(queryParamMonthInMM, queryParamYearInYYYY);
+  const suffix = getGenderSuffix(baseInfo.data.sexo);
+
+  const { seoTitle, seoDescription } = getSEOTitleAndDescription(
+    suffix,
+    baseInfo.data,
+    total,
+    seoDates,
+  );
+
+  const data = {
+    cabinetData: cabinetData.data ?? [],
+    description: seoDescription,
+    expenses: monthExpenses.data,
+    federalDeputyBaseInfo: baseInfo.data,
+    federalDeputyWorkHistory: workHistory.data,
+    federalDeputyMonthlyCabinetExpenses: monthlyCabinetExpenses ?? null,
+    speechesData: speechesData.data ?? [],
+    title: seoTitle,
   };
 
   return { props: { data } };
@@ -222,7 +163,8 @@ export default function FederalDeputy({ data }) {
         <meta
           property="og:image"
           content={
-            data?.politician?.ultimoStatus?.urlFoto || defaultSeoConfig.imageUrl
+            data?.federalDeputyBaseInfo?.ultimoStatus?.urlFoto ||
+            defaultSeoConfig.imageUrl
           }
         />
         <meta
@@ -247,7 +189,8 @@ export default function FederalDeputy({ data }) {
         <meta
           name="twitter:image"
           content={
-            data?.politician?.ultimoStatus?.urlFoto || defaultSeoConfig.imageUrl
+            data?.federalDeputyBaseInfo?.ultimoStatus?.urlFoto ||
+            defaultSeoConfig.imageUrl
           }
         />
         <meta
@@ -284,26 +227,28 @@ export default function FederalDeputy({ data }) {
           <div className="flex flex-col md:flex-row items-center justify-center">
             <div className="">
               <Image
-                src={data?.politician?.ultimoStatus?.urlFoto}
-                alt={data?.politician?.ultimoStatus?.nome}
+                src={data?.federalDeputyBaseInfo?.ultimoStatus?.urlFoto}
+                alt={data?.federalDeputyBaseInfo?.ultimoStatus?.nome}
                 className="w-full h-full rounded-lg shadow-xl object-contain max-w-[180px] max-h-[240px]"
               />
             </div>
             <div className="md:w-1/2 md:ml-4 mt-4 md:mt-0 flex flex-col sm:pr-6 sm:pl-6 flex flex-col sm:pr-6 sm:pl-6">
               <h1 className="text-xl font-semibold">
-                Deputad{getGenderSuffix(data?.politician?.sexo)} Federal{" "}
-                {data?.politician?.ultimoStatus?.nome}
+                Deputad{getGenderSuffix(data?.federalDeputyBaseInfo?.sexo)}{" "}
+                Federal {data?.federalDeputyBaseInfo?.ultimoStatus?.nome}
               </h1>
               <p className="text-gray-600">
-                {data?.politician?.nomeCivil} é um
-                {data?.politician?.sexo === "F" ? "a" : ""} deputad
-                {getGenderSuffix(data?.politician?.sexo)} brasileir
-                {getGenderSuffix(data?.politician?.sexo)} pelo partido{" "}
-                {data?.politician?.ultimoStatus?.siglaPartido}/
-                {data?.politician?.ultimoStatus?.siglaUf}, tem{" "}
-                {calculateAge(data?.politician?.dataNascimento)} anos e nasceu
-                na cidade de {data?.politician?.municipioNascimento}/
-                {data?.politician?.ufNascimento}.
+                {data?.federalDeputyBaseInfo?.nomeCivil} é um
+                {data?.federalDeputyBaseInfo?.sexo === "F" ? "a" : ""} deputad
+                {getGenderSuffix(data?.federalDeputyBaseInfo?.sexo)} brasileir
+                {getGenderSuffix(data?.federalDeputyBaseInfo?.sexo)} pelo
+                partido{" "}
+                {data?.federalDeputyBaseInfo?.ultimoStatus?.siglaPartido}/
+                {data?.federalDeputyBaseInfo?.ultimoStatus?.siglaUf}, tem{" "}
+                {calculateAge(data?.federalDeputyBaseInfo?.dataNascimento)} anos
+                e nasceu na cidade de{" "}
+                {data?.federalDeputyBaseInfo?.municipioNascimento}/
+                {data?.federalDeputyBaseInfo?.ufNascimento}.
               </p>{" "}
             </div>
           </div>
@@ -350,14 +295,28 @@ export default function FederalDeputy({ data }) {
                   )}
                   <Divider className="my-5" />
 
-                  {data?.monthlyGabineteMoney && (
+                  {data?.federalDeputyMonthlyCabinetExpenses && (
                     <div
                       className="bg-yellow-100 mb-5 border-l-4 border-yellow-100 text-yellow-700 p-4 rounded-lg"
                       role="alert"
                     >
                       Além da cota parlamentar foi utilizado{" "}
-                      <i>R$ {data?.monthlyGabineteMoney.expense_amount}</i> de{" "}
-                      <i> R$ {data?.monthlyGabineteMoney.available_amount}</i>{" "}
+                      <i>
+                        R${" "}
+                        {
+                          data?.federalDeputyMonthlyCabinetExpenses
+                            .expense_amount
+                        }
+                      </i>{" "}
+                      de{" "}
+                      <i>
+                        {" "}
+                        R${" "}
+                        {
+                          data?.federalDeputyMonthlyCabinetExpenses
+                            .available_amount
+                        }
+                      </i>{" "}
                       disponível da verba de gabinete.
                     </div>
                   )}
@@ -431,7 +390,7 @@ export default function FederalDeputy({ data }) {
                     parlamentares que trabalham para o mandato, em Brasília ou
                     nos estados.
                   </p>
-                  <Chart data={data?.gabinete?.montly_expenses} />
+                  <Chart data={data?.cabinetData?.montly_expenses} />
 
                   <h3 className="my-4">Conheça a equipe de secretários</h3>
 
@@ -445,42 +404,44 @@ export default function FederalDeputy({ data }) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-2 ">
-                      {data?.gabinete?.active_secretaries?.map((secretary) => {
-                        return (
-                          <>
-                            <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Nome:{" "}
-                              </span>
-                              {secretary?.name}
-                            </div>
-                            <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Grupo funcional:
-                              </span>
-                              {secretary?.group}
-                            </div>
-                            <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Cargo:{" "}
-                              </span>
-                              {secretary?.role}
-                            </div>
-                            <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Período de exercício:{" "}
-                              </span>{" "}
-                              {secretary?.period}
-                            </div>
-                            <div className="col-span-1 p-2 border-gray-300">
-                              <span className="md:hidden font-bold">
-                                Remuneração mensal:{" "}
-                              </span>
-                              Em breve
-                            </div>
-                          </>
-                        );
-                      })}
+                      {data?.cabinetData?.active_secretaries?.map(
+                        (secretary, index) => {
+                          return (
+                            <Fragment key={index}>
+                              <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
+                                <span className="md:hidden font-bold">
+                                  Nome:{" "}
+                                </span>
+                                {secretary?.name}
+                              </div>
+                              <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
+                                <span className="md:hidden font-bold">
+                                  Grupo funcional:
+                                </span>
+                                {secretary?.group}
+                              </div>
+                              <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
+                                <span className="md:hidden font-bold">
+                                  Cargo:{" "}
+                                </span>
+                                {secretary?.role}
+                              </div>
+                              <div className="col-span-1 p-2 border-b md:border-b-0 border-gray-300">
+                                <span className="md:hidden font-bold">
+                                  Período de exercício:{" "}
+                                </span>{" "}
+                                {secretary?.period}
+                              </div>
+                              <div className="col-span-1 p-2 border-gray-300">
+                                <span className="md:hidden font-bold">
+                                  Remuneração mensal:{" "}
+                                </span>
+                                Em breve
+                              </div>
+                            </Fragment>
+                          );
+                        },
+                      )}
                     </div>
                   </div>
                 </CardBody>
@@ -489,14 +450,14 @@ export default function FederalDeputy({ data }) {
             <Tab key="videos" title="Videos">
               <Card>
                 <CardBody>
-                  {data?.speeches?.length === 0 && (
+                  {data?.speechesData?.length === 0 && (
                     <>
                       <small className="text-start">
                         Não existe vídeos para esse parlamentar
                       </small>
                     </>
                   )}
-                  {data?.speeches?.length > 0 && (
+                  {data?.speechesData?.length > 0 && (
                     <>
                       <div
                         className="bg-gray-100 mb-5 border-l-4 border-gray-300 text-dark-700 p-4 rounded-lg"
@@ -508,7 +469,7 @@ export default function FederalDeputy({ data }) {
                         para a página da câmara.
                       </div>
                       <ol className="relative border-l border-gray-200 dark:border-gray-700">
-                        {data?.speeches.map((speeche) => {
+                        {data?.speechesData.map((speeche) => {
                           return (
                             <EventItem
                               key={speeche.evento_id}
@@ -518,7 +479,9 @@ export default function FederalDeputy({ data }) {
                               time={speeche.time}
                               place={speeche.place}
                               videos={speeche.video_links}
-                              name={data?.politician?.ultimoStatus?.nome}
+                              name={
+                                data?.federalDeputyBaseInfo?.ultimoStatus?.nome
+                              }
                             />
                           );
                         })}
@@ -539,7 +502,7 @@ export default function FederalDeputy({ data }) {
                             Nome civil
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                            {data?.politician?.nomeCivil}
+                            {data?.federalDeputyBaseInfo?.nomeCivil}
                           </p>
                         </div>
                       </div>
@@ -551,7 +514,7 @@ export default function FederalDeputy({ data }) {
                             CPF
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                            {formatCPFCNPJ(data?.politician?.cpf)}
+                            {formatCPFCNPJ(data?.federalDeputyBaseInfo?.cpf)}
                           </p>
                         </div>
                       </div>
@@ -575,7 +538,7 @@ export default function FederalDeputy({ data }) {
                             Escolaridade
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                            {data?.politician?.escolaridade}
+                            {data?.federalDeputyBaseInfo?.escolaridade}
                           </p>
                         </div>
                       </div>
@@ -587,7 +550,9 @@ export default function FederalDeputy({ data }) {
                             Data de Nascimento
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                            {formatDate(data?.politician?.dataNascimento)}
+                            {formatDate(
+                              data?.federalDeputyBaseInfo?.dataNascimento,
+                            )}
                           </p>
                         </div>
                       </div>
@@ -599,8 +564,8 @@ export default function FederalDeputy({ data }) {
                             Naturalidade
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                            {data?.politician?.municipioNascimento}/
-                            {data?.politician?.ufNascimento}
+                            {data?.federalDeputyBaseInfo?.municipioNascimento}/
+                            {data?.federalDeputyBaseInfo?.ufNascimento}
                           </p>
                         </div>
                       </div>
@@ -612,22 +577,24 @@ export default function FederalDeputy({ data }) {
             <Tab key="historico-profissional" title="Histórico profissional">
               <Card>
                 <CardBody>
-                  {data?.experiences?.length > 0 && (
+                  {data?.federalDeputyWorkHistory?.length > 0 && (
                     <>
                       <ol className=" relative border-l border-gray-200 dark:border-gray-700">
-                        {data.experiences.map((experience, index) => {
-                          return (
-                            <ExperienceItem
-                              key={experience.titulo + index}
-                              title={experience.titulo}
-                              company={experience.entidade}
-                              companyUf={experience.entidadeUF}
-                              companyCountry={experience.entidadePais}
-                              start={experience.anoInicio}
-                              end={experience.anoFim}
-                            />
-                          );
-                        })}
+                        {data.federalDeputyWorkHistory.map(
+                          (workExperience, index) => {
+                            return (
+                              <ExperienceItem
+                                key={workExperience.titulo + index}
+                                title={workExperience.titulo}
+                                company={workExperience.entidade}
+                                companyUf={workExperience.entidadeUF}
+                                companyCountry={workExperience.entidadePais}
+                                start={workExperience.anoInicio}
+                                end={workExperience.anoFim}
+                              />
+                            );
+                          },
+                        )}
                       </ol>
                     </>
                   )}
@@ -645,7 +612,7 @@ export default function FederalDeputy({ data }) {
                             E-mail
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                            {data?.politician?.ultimoStatus?.email}
+                            {data?.federalDeputyBaseInfo?.ultimoStatus?.email}
                           </p>
                         </div>
                       </div>
@@ -657,11 +624,20 @@ export default function FederalDeputy({ data }) {
                             Onde encontrar
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400 whitespace-normal">
-                            {data?.politician?.ultimoStatus?.gabinete?.andar}°
-                            andar, Sala{" "}
-                            {data?.politician?.ultimoStatus?.gabinete?.nome} do
-                            prédio{" "}
-                            {data?.politician?.ultimoStatus?.gabinete?.predio}{" "}
+                            {
+                              data?.federalDeputyBaseInfo?.ultimoStatus
+                                ?.cabinetData?.andar
+                            }
+                            ° andar, Sala{" "}
+                            {
+                              data?.federalDeputyBaseInfo?.ultimoStatus
+                                ?.cabinetData?.nome
+                            }{" "}
+                            do prédio{" "}
+                            {
+                              data?.federalDeputyBaseInfo?.ultimoStatus
+                                ?.cabinetData?.predio
+                            }{" "}
                             na Praça dos Poderes, Brasilia/DF
                           </p>
                         </div>
@@ -677,21 +653,21 @@ export default function FederalDeputy({ data }) {
                               </p>
                               <p className="text-sm text-gray-500 truncate dark:text-gray-400">
                                 {formatPhoneNumberDf(
-                                  data?.politician?.ultimoStatus?.gabinete
-                                    ?.telefone,
+                                  data?.federalDeputyBaseInfo?.ultimoStatus
+                                    ?.gabinete?.telefone,
                                 )}
                               </p>
                             </div>
 
                             <a
                               href={`tel:+55${formatPhoneNumberDf(
-                                data?.politician?.ultimoStatus?.gabinete?.telefone.replace(
+                                data?.federalDeputyBaseInfo?.ultimoStatus?.gabinete?.telefone.replace(
                                   /\D/g,
                                   "",
                                 ),
                               )}`}
                               className="flex items-center text-sm bg-success-500 hover:bg-success-700 text-white font py-2 px-4 rounded"
-                              title={`Ligue agora para ${data?.politician?.nomeCivil}`}
+                              title={`Ligue agora para ${data?.federalDeputyBaseInfo?.nomeCivil}`}
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -721,8 +697,8 @@ export default function FederalDeputy({ data }) {
                             Site
                           </p>
                           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                            {data?.politician?.urlWebsite
-                              ? data?.politician?.urlWebsite
+                            {data?.federalDeputyBaseInfo?.urlWebsite
+                              ? data?.federalDeputyBaseInfo?.urlWebsite
                               : "Não informado"}
                           </p>
                         </div>
@@ -734,26 +710,29 @@ export default function FederalDeputy({ data }) {
                           <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
                             Redes sociais
                           </p>
-                          {data?.politician?.redeSocial.length === 0 && (
+                          {data?.federalDeputyBaseInfo?.redeSocial.length ===
+                            0 && (
                             <p className="text-sm text-gray-500 truncate dark:text-gray-400">
                               Não informado
                             </p>
                           )}
 
-                          {data?.politician?.redeSocial?.map((profile) => {
-                            return (
-                              <a
-                                key={profile.split("?")[0]}
-                                href={profile.split("?")[0]}
-                                rel="nofollow"
-                                target="_blank"
-                                className="text-sm text-gray-500 underline truncate dark:text-gray-400"
-                                title={`Acesse o perfil: ${data?.politician?.nomeCivil}`}
-                              >
-                                {profile.split("?")[0]}
-                              </a>
-                            );
-                          })}
+                          {data?.federalDeputyBaseInfo?.redeSocial?.map(
+                            (profile) => {
+                              return (
+                                <a
+                                  key={profile.split("?")[0]}
+                                  href={profile.split("?")[0]}
+                                  rel="nofollow"
+                                  target="_blank"
+                                  className="text-sm text-gray-500 underline truncate dark:text-gray-400"
+                                  title={`Acesse o perfil: ${data?.federalDeputyBaseInfo?.nomeCivil}`}
+                                >
+                                  {profile.split("?")[0]}
+                                </a>
+                              );
+                            },
+                          )}
                         </div>
                       </div>
                     </li>
@@ -842,4 +821,34 @@ export default function FederalDeputy({ data }) {
       </section>
     </>
   );
+}
+
+function getDateForSEO(monthInMM, yearInYYYY) {
+  const monthForSEO = new Date(`${monthInMM}-30-${yearInYYYY}`).toLocaleString(
+    "pt-BR",
+    { month: "long" },
+  );
+  const yearForSEO = yearInYYYY;
+
+  return {
+    month: monthForSEO,
+    year: yearForSEO,
+  };
+}
+
+function getSEOTitleAndDescription(
+  genderSuffix,
+  federalDeputyBaseInfo,
+  federalDeputyTotalMonthlyExpenses,
+  seoDates,
+) {
+  const title = `Gastos d${genderSuffix} deputad${genderSuffix} Federal
+${federalDeputyBaseInfo?.ultimoStatus?.nome} você confere aqui no BrasiliApp`;
+  const description = `${genderSuffix.toUpperCase()} deputad${genderSuffix} Federal
+${federalDeputyBaseInfo?.ultimoStatus?.nome} gastou 
+${federalDeputyTotalMonthlyExpenses} em ${seoDates.month} de ${
+    seoDates.year
+  }, confira aqui como ele usou a cota parlamentar`;
+
+  return { seoTitle: title, seoDescription: description };
 }
