@@ -26,11 +26,17 @@ export default function Header({
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-default-400 text-small">
-          Total de {numberOfDeputies} parlamentares{" "}
-          {party !== "all" ? `do ${party.currentKey}` : ""}
-          {state !== "all" ? `/${state.currentKey}` : " no Brasil"}
-        </span>
+        {numberOfDeputies == 0 ? (
+          <span className="text-default-400 text-small">
+            Nenhum parlamentar encontrado
+          </span>
+        ) : (
+          <span className="text-default-400 text-small">
+            Total de {numberOfDeputies} parlamentares{" "}
+            {party !== "all" ? `do ${party?.currentKey}` : ""}
+            {state !== "all" ? `/${state?.currentKey}` : " no Brasil"}
+          </span>
+        )}
       </div>
     </div>
   );

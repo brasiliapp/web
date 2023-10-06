@@ -1,41 +1,17 @@
 "use client";
 import { useState, useMemo, startTransition, useCallback } from "react";
+import {
+  ChevronRightIcon,
+  EnvelopeIcon,
+} from "@heroicons/react/24/outline";
+
 import Link from "next/link";
 import Image from "next/image";
 
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Button,
-  Chip,
-} from "@nextui-org/react";
-
 import Header from "./Header";
 
-import { columns } from "@/utils/data";
 import { slugify } from "@/utils";
 
-const INITIAL_VISIBLE_COLUMNS = [
-  "nome",
-  "partido",
-  "email",
-  "estado",
-  "actions",
-];
-
-const headerColumns = columns.filter((column) =>
-  INITIAL_VISIBLE_COLUMNS.includes(column.uid)
-);
-
-const statusColorMap = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
 
 export default function DeputiesTable({ deputies }) {
   const [state, setState] = useState("all");
@@ -72,147 +48,74 @@ export default function DeputiesTable({ deputies }) {
     });
   }
 
-  const renderCell = useCallback((deputy, columnKey) => {
-    const cellValue = deputy[columnKey];
-
+  const renderRow = useCallback((deputy) => {
     const navigateTo = `/deputado-federal/${slugify(deputy.nome)}-${deputy.id}`;
-
-    switch (columnKey) {
-      case "nome":
-        return (
-          <Link
-            color="dark"
-            href={navigateTo}
-            className="flex items-center gap-4 text-black-500"
-          >
-            <div className="relative w-8 h-8 overflow-hidden rounded-lg min-w-8 sm:h-11 sm:w-11">
-              <Image
-                fill
-                sizes="50vw"
-                src={deputy.urlFoto}
-                alt={deputy.nome}
-                className="object-fill"
+    return (
+      <li key={deputy.nome}>
+        <Link href={navigateTo} className="block hover:bg-gray-50">
+          <div className="flex items-center px-4 py-4 sm:px-6">
+            <div className="flex min-w-0 flex-1 items-center">
+              <div className="flex-shrink-0">
+                <Image
+                  width={50}
+                  height={50}
+                  src={deputy.urlFoto}
+                  alt={deputy.nome}
+                  className="h-35 w-18 rounded"
+                />
+              </div>
+              <div className="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4">
+                <div>
+                  <p className="truncate text-sm font-medium text-gray-700">
+                    {deputy.nome}
+                  </p>
+                  <p className="mt-2 flex items-center text-sm text-gray-500">
+                    <EnvelopeIcon
+                      className="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-400"
+                      aria-hidden="true"
+                    />
+                    <span className="truncate">{deputy.email}</span>
+                  </p>
+                </div>
+                <div className="md:block">
+                  <div>
+                    <p className="mt-2 flex items-center text-sm text-gray-500">
+                      {deputy.siglaPartido} / {deputy.siglaUf}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <ChevronRightIcon
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
               />
             </div>
-
-            <span className="text-xs sm:text-sm">{deputy.nome}</span>
-          </Link>
-        );
-      case "partido":
-        return (
-          <div className="flex items-start">
-            <Link href={navigateTo} color="dark" className="text-black-500">
-              <p className="capitalize text-bold text-tiny text-default-400">
-                {deputy.siglaPartido}
-              </p>
-            </Link>
           </div>
-        );
-      case "estado":
-        return (
-          <div className="flex items-start">
-            <p className="capitalize text-bold text-small">{cellValue}</p>
-
-            <Link href={navigateTo} color="dark" className="text-black-500">
-              <p className="capitalize text-bold text-tiny text-default-400">
-                {deputy.siglaUf}
-              </p>
-            </Link>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[deputy.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-start justify-start gap-2">
-            <Button
-              href={navigateTo}
-              as={Link}
-              size="sm"
-              color="dark"
-              className="text-black-500"
-              endContent={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
-                  <path
-                    fillRule="evenodd"
-                    d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              }
-            >
-              Ver
-            </Button>
-          </div>
-        );
-      case "email":
-        return <div className="flex items-start">{cellValue}</div>;
-      default:
-        return cellValue;
-    }
+        </Link>
+      </li>
+    );
   }, []);
 
   return (
     <div className="flex">
-      <Table
-        aria-label="Deputados Table"
-        isHeaderSticky={true}
-        className="my-3 d-flex"
-        topContentPlacement="inside"
-        topContent={
-          <Header
-            party={party}
-            setParty={setParty}
-            state={state}
-            setState={setState}
-            numberOfDeputies={filteredDeputies.length}
-            searchValue={search}
-            onSearchChange={onSearchChange}
-          />
-        }
-      >
-        <TableHeader columns={headerColumns}>
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
-              allowsSorting={column.sortable}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-
-        <TableBody
-          emptyContent={"Nenhum deputado encontrado"}
-          items={filteredDeputies}
-        >
-          {(deputy) => (
-            <TableRow key={deputy.id}>
-              {(columnKey) => (
-                <TableCell className={columnKey === "actions" && "px-0"}>
-                  {renderCell(deputy, columnKey)}
-                </TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <div className="p-4 z-0 flex flex-col relative justify-between gap-4 bg-content1 overflow-hidden rounded-large shadow-small w-full">
+        <Header
+          party={party}
+          setParty={setParty}
+          state={state}
+          setState={setState}
+          numberOfDeputies={filteredDeputies.length}
+          searchValue={search}
+          onSearchChange={onSearchChange}
+        />
+        <ul role="list" className="divide-y divide-gray-100">
+          {filteredDeputies.map((deputy) => {
+            return renderRow(deputy);
+          })}
+        </ul>
+      </div>
     </div>
   );
 }
