@@ -48,7 +48,7 @@ export default function DeputiesTable({ deputies }) {
     });
   }
 
-  const renderRow = useCallback((deputy) => {
+  const renderRow = (deputy) => {
     const navigateTo = `/deputado-federal/${slugify(deputy.nome)}-${deputy.id}`;
     return (
       <li key={deputy.nome}>
@@ -96,7 +96,7 @@ export default function DeputiesTable({ deputies }) {
         </Link>
       </li>
     );
-  }, []);
+  };
 
   return (
     <div className="flex">

@@ -81,7 +81,7 @@ export async function getServerSideProps(ctx) {
       console.log("fail to get gabinete");
     }
 
-    if (data?.speeches?.length > 0) {
+    if (data?.speeches?.length > 0 && !yearUrl && !monthUrl) {
       fetchVideos(data?.speeches);
       try {
         let eventsArray = propertyValuesArray(
