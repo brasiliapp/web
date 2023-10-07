@@ -1,13 +1,20 @@
+"use client";
+
 import React, { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { Button } from "@nextui-org/react";
 
 export const MonthChanger = ({ changeDateHandler }) => {
   const router = useRouter();
-  const { ano: routerQueryYear, mes: routerQueryMonth } = router.query;
+
+  const searchParams = useSearchParams();
+
+  const routeQueryMonth = searchParams.get("mes");
+  const routeQueryYear = searchParams.get("ano");
+  const { name: federalDeputyNameAndId } = useParams();
 
   const [displayDate, setDisplayDate] = useState(
-    getInitialDisplayDate(routerQueryYear, routerQueryMonth),
+    getInitialDisplayDate(routeQueryYear, routeQueryMonth)
   );
 
   const changeDateMonthByOffset = (offset) => {
@@ -16,9 +23,9 @@ export const MonthChanger = ({ changeDateHandler }) => {
     setDisplayDate(newDate);
 
     router.push(
-      `/deputado-federal/${router.query.name}?mes=${(newDate.getMonth() + 1)
+      `${federalDeputyNameAndId}?&mes=${(newDate.getMonth() + 1)
         .toString()
-        .padStart(2, "0")}&ano=${newDate.getFullYear()}`,
+        .padStart(2, "0")}&ano=${newDate.getFullYear()}`
     );
 
     changeDateHandler({

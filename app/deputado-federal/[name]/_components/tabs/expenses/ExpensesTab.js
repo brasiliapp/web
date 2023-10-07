@@ -1,3 +1,7 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useSearchParams, useParams } from "next/navigation";
 import { CircularProgress, Divider } from "@nextui-org/react";
 
 import ExpenseCategories from "./ExpenseCategories";
@@ -8,10 +12,27 @@ import { calculateTotal, formatMonetaryValue } from "@/utils";
 export function ExpensesTab({
   expenses,
   monthlyCabinetExpenses,
-  changeDateHandler,
-  isLoading,
   openExpenseHandler,
 }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentDate, setCurrentDate] = useState({
+    numericMonth: "",
+    fullMonth: "",
+    year: "",
+  });
+
+  const { name: federalDeputyNameAndId } = useParams();
+  const routeQueryParams = useSearchParams();
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [federalDeputyNameAndId, routeQueryParams]);
+
+  const handleDateChange = (newDate) => {
+    setIsLoading(true);
+    setCurrentDate(newDate);
+  };
+
   return (
     <>
       {expenses?.length > 0 ? (
@@ -29,29 +50,8 @@ export function ExpensesTab({
         </div>
       )}
 
-      <MonthChanger changeDateHandler={changeDateHandler} />
-
-      {!isLoading && expenses?.length > 0 && (
-        <>
-          <Divider className="my-5" />
-          <ExpenseCategories expenses={expenses} isLoading={isLoading} />
-        </>
-      )}
-
+      <MonthChanger changeDateHandler={handleDateChange} />
       <Divider className="my-5" />
-
-      {monthlyCabinetExpenses && (
-        <div
-          className="bg-yellow-100 mb-5 border-l-4 border-yellow-100 text-yellow-700 p-4 rounded-lg"
-          role="alert"
-        >
-          Além da cota parlamentar foi utilizado{" "}
-          <i>R$ {monthlyCabinetExpenses.expense_amount}</i> de{" "}
-          <i> R$ {monthlyCabinetExpenses.available_amount}</i> disponível da
-          verba de gabinete.
-        </div>
-      )}
-
       {expenses?.length === 0 && !isLoading && (
         <small className="text-center">
           Sem gastos do parlamentar nesse mês
@@ -73,6 +73,19 @@ export function ExpensesTab({
 
       {expenses?.length > 0 && !isLoading && (
         <>
+          <ExpenseCategories expenses={expenses} />
+          <Divider className="my-5" />
+          {monthlyCabinetExpenses && (
+            <div
+              className="bg-yellow-100 mb-5 border-l-4 border-yellow-100 text-yellow-700 p-4 rounded-lg"
+              role="alert"
+            >
+              Além da cota parlamentar foi utilizado{" "}
+              <i>R$ {monthlyCabinetExpenses.expense_amount}</i> de{" "}
+              <i> R$ {monthlyCabinetExpenses.available_amount}</i> disponível da
+              verba de gabinete.
+            </div>
+          )}
           <ol className="relative border-l border-gray-200 dark:border-gray-700 ">
             {expenses
               .sort(

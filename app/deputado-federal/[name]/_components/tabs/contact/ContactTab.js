@@ -23,11 +23,11 @@ export function ContactTab({ federalDeputyBaseInfo }) {
                 Onde encontrar
               </p>
               <p className="text-sm text-gray-500 truncate dark:text-gray-400 whitespace-normal">
-                {federalDeputyBaseInfo?.ultimoStatus?.cabinetData?.andar}°
+                {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.andar}°
                 andar, Sala{" "}
-                {federalDeputyBaseInfo?.ultimoStatus?.cabinetData?.nome} do
+                {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.nome} do
                 prédio{" "}
-                {federalDeputyBaseInfo?.ultimoStatus?.cabinetData?.predio} na
+                {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.predio} na
                 Praça dos Poderes, Brasilia/DF
               </p>
             </div>

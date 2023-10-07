@@ -1,7 +1,6 @@
 import EventItem from "./EventItem";
 
 export function VideosTab({ speechesData, federalDeputyName }) {
-  console.log("LEN", speechesData.len);
   return (
     <>
       {speechesData?.length === 0 && (

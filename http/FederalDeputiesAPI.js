@@ -1,4 +1,4 @@
-import axios from "axios";
+import fetch from "node-fetch";
 
 export class FederalDeputiesAPI {
   constructor() {
@@ -6,13 +6,11 @@ export class FederalDeputiesAPI {
       throw new Error("FederalDeputiesAPI is an abstract class");
     }
 
-    this._axiosInstance = axios;
-    this._chamberOfDeputiesAPIBaseURL =
-      "https://dadosabertos.camara.leg.br/api/v2";
+    this._baseUrl = "https://dadosabertos.camara.leg.br/api/v2";
+    this._chamberOfDeputiesAPIInstance = this;
+  }
 
-    this._chamberOfDeputiesAPIInstance = this._axiosInstance.create({
-      baseURL: this._chamberOfDeputiesAPIBaseURL,
-      headers: { "Content-Type": "application/json" },
-    });
+  async get(endpoint) {
+    return fetch(`${this._baseUrl}/${endpoint}`);
   }
 }

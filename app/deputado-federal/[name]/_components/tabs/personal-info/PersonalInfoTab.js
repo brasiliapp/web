@@ -1,4 +1,5 @@
 import { formatDate, formatCPFCNPJ } from "@/utils";
+
 export function PersonalInfoTab({ federalDeputyBaseInfo }) {
   return (
     <>

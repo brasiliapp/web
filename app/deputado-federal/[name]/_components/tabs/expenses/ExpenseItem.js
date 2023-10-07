@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   formatMonetaryValue,
   formatDate,
@@ -14,7 +12,6 @@ export default function ExpenseItem({
   supplierId,
   document,
   type,
-  handleOpen,
 }) {
   return (
     <li className="mb-10 ml-6">
