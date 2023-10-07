@@ -9,7 +9,7 @@ export class GetFederalDeputyDataService extends FederalDeputiesAPI {
 
     if (!response.ok) {
       console.error("Failed to fetch Federal Deputy base data:", response);
-      throw new Error("Failed to fetch Federal Deputy base data", response);
+      throw new Error("Failed to fetch Federal Deputy base data");
     }
 
     const data = await response.json();
