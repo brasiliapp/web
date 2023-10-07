@@ -6,30 +6,12 @@ import {
   removeDotsFromPhrase,
 } from "@/utils";
 
-export function calculateTotalByExpenseType(expenses, expenseType) {
-  const totalCost = expenses?.reduce((accumulator, expense) => {
-    if (expense.tipoDespesa !== expenseType) {
-      return accumulator + 0;
-    }
-
-    const cost = expense.valorLiquido;
-
-    if (typeof cost === "number" && !isNaN(cost)) {
-      return accumulator + cost;
-    }
-
-    return accumulator;
-  }, 0);
-
-  return totalCost;
-}
-
 export default function ExpenseCategories({ expenses }) {
   const expensesTypesPresentOnExpensesSet = new Set(
-    expenses.map((expense) => expense.tipoDespesa),
+    expenses.map((expense) => expense.tipoDespesa)
   );
   const expensesTypesPresentOnExpenses = Array.from(
-    expensesTypesPresentOnExpensesSet,
+    expensesTypesPresentOnExpensesSet
   ).sort();
 
   return (
@@ -38,11 +20,11 @@ export default function ExpenseCategories({ expenses }) {
       <ul className="flex flex-row gap-2 py-4 overflow-x-scroll">
         {expensesTypesPresentOnExpenses.map((expenseType) => {
           const treatedExpenseType = removeDotsFromPhrase(
-            getCapitalizedPhrase(expenseType),
+            getCapitalizedPhrase(expenseType)
           );
           const totalExpenseValueByType = calculateTotalByExpenseType(
             expenses,
-            expenseType,
+            expenseType
           );
 
           return (
@@ -63,4 +45,22 @@ export default function ExpenseCategories({ expenses }) {
       </ul>
     </section>
   );
+}
+
+export function calculateTotalByExpenseType(expenses, expenseType) {
+  const totalCost = expenses?.reduce((accumulator, expense) => {
+    if (expense.tipoDespesa !== expenseType) {
+      return accumulator + 0;
+    }
+
+    const cost = expense.valorLiquido;
+
+    if (typeof cost === "number" && !isNaN(cost)) {
+      return accumulator + cost;
+    }
+
+    return accumulator;
+  }, 0);
+
+  return totalCost;
 }

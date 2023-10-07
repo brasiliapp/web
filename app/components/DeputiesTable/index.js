@@ -1,17 +1,13 @@
 "use client";
 import { useState, useMemo, startTransition, useCallback } from "react";
-import {
-  ChevronRightIcon,
-  EnvelopeIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronRightIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 
 import Link from "next/link";
 import Image from "next/image";
 
 import Header from "./Header";
 
-import { slugify } from "@/utils";
-
+import { getCurrentDateInfo, slugify } from "@/utils";
 
 export default function DeputiesTable({ deputies }) {
   const [state, setState] = useState("all");
@@ -49,7 +45,13 @@ export default function DeputiesTable({ deputies }) {
   }
 
   const renderRow = (deputy) => {
-    const navigateTo = `/deputado-federal/${slugify(deputy.nome)}-${deputy.id}`;
+    const { numericMonth, year } = getCurrentDateInfo();
+    const queryParams = `mes=${numericMonth}&ano=${year}`;
+
+    const navigateTo = `/deputado-federal/${slugify(deputy.nome)}-${
+      deputy.id
+    }?${queryParams}`;
+
     return (
       <li key={deputy.nome}>
         <Link href={navigateTo} className="block hover:bg-gray-50">

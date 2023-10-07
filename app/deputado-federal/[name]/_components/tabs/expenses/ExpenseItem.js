@@ -1,11 +1,9 @@
-import React from "react";
-
 import {
   formatMonetaryValue,
   formatDate,
   formatCPFCNPJ,
   identifyPerson,
-} from "../utils";
+} from "@/utils";
 
 export default function ExpenseItem({
   value,
@@ -14,7 +12,6 @@ export default function ExpenseItem({
   supplierId,
   document,
   type,
-  handleOpen,
 }) {
   return (
     <li className="mb-10 ml-6">
