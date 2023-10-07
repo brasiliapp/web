@@ -5,10 +5,10 @@ import { Footer } from "@/components";
 import { defaultSeoConfig } from "@/seoConfig";
 import { GetFederalDeputyDataService } from "@/services";
 import {
-  getGenderSuffix,
   calculateTotal,
-  formatMonetaryValue,
   fetchVideos,
+  formatMonetaryValue,
+  getGenderSuffix,
 } from "@/utils";
 
 export default async function FederalDeputy({ params, searchParams }) {
@@ -40,8 +40,7 @@ export default async function FederalDeputy({ params, searchParams }) {
         <meta
           property="og:image"
           content={
-            data?.federalDeputyBaseInfo?.ultimoStatus?.urlFoto ||
-            defaultSeoConfig.imageUrl
+            data?.baseInfo?.ultimoStatus?.urlFoto || defaultSeoConfig.imageUrl
           }
         />
         <meta property="og:url" content={fullUrl || defaultSeoConfig.url} />
@@ -58,16 +57,22 @@ export default async function FederalDeputy({ params, searchParams }) {
         <meta
           name="twitter:image"
           content={
-            data?.federalDeputyBaseInfo?.ultimoStatus?.urlFoto ||
-            defaultSeoConfig.imageUrl
+            data?.baseInfo?.ultimoStatus?.urlFoto || defaultSeoConfig.imageUrl
           }
         />
         <meta name="twitter:url" content={fullUrl || defaultSeoConfig.url} />
       </Head>
 
       <main className="mt-3 z-0 flex flex-col relative justify-between rounded-large w-full">
-        <Header data={data} />
-        <InfoTabs data={data} />
+        <Header federalDeputyBaseInfo={data.baseInfo} />
+        <InfoTabs
+          expenses={data.expenses}
+          monthlyCabinetExpenses={data.monthlyCabinetExpenses}
+          cabinetData={data.cabinetData}
+          speechesData={data.speechesData}
+          baseInfo={data.baseInfo}
+          workHistory={data.workHistory}
+        />
       </main>
       <Footer />
     </>
@@ -82,13 +87,23 @@ async function getData(
   const getFederalDeputyDataService = new GetFederalDeputyDataService();
 
   const id = federalDeputyNameAndId.split("-").at(-1);
-  const baseInfo = await getFederalDeputyDataService.fetchBaseData(id);
-  const workHistory = await getFederalDeputyDataService.fetchWorkHistory(id);
-  const monthExpenses = await getFederalDeputyDataService.fetchExpenses(
-    id,
-    monthQueryParam,
-    yearQueryParam,
-  );
+
+  const fetchPromises = [
+    getFederalDeputyDataService.fetchBaseData(id),
+    getFederalDeputyDataService.fetchWorkHistory(id),
+    getFederalDeputyDataService.fetchExpenses(
+      id,
+      monthQueryParam,
+      yearQueryParam,
+    ),
+  ];
+
+  const [baseInfoResp, workHistoryResp, monthExpensesResp] =
+    await Promise.allSettled(fetchPromises);
+
+  const baseInfo = baseInfoResp.value;
+  const workHistory = workHistoryResp.value;
+  const monthExpenses = monthExpensesResp.value;
 
   let speechesData, cabinetData;
   try {
@@ -129,18 +144,16 @@ async function getData(
     seoDates,
   );
 
-  const data = {
+  return {
     cabinetData: cabinetData.data ?? [],
     description: seoDescription,
     expenses: monthExpenses.data,
-    federalDeputyBaseInfo: baseInfo.data,
-    federalDeputyWorkHistory: workHistory.data,
-    federalDeputyMonthlyCabinetExpenses: monthlyCabinetExpenses ?? null,
+    baseInfo: baseInfo.data,
+    workHistory: workHistory.data,
+    monthlyCabinetExpenses: monthlyCabinetExpenses ?? null,
     speechesData: speechesData.data ?? [],
     title: seoTitle,
   };
-
-  return data;
 }
 
 function getDateForSEO(monthInMM, yearInYYYY) {

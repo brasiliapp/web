@@ -5,7 +5,14 @@ import { Tab, Tabs, Card, CardBody } from "@nextui-org/react";
 
 import { tabs } from "./tabs";
 
-export function InfoTabs({ data }) {
+export function InfoTabs({
+  expenses,
+  monthlyCabinetExpenses,
+  cabinetData,
+  speechesData,
+  baseInfo,
+  workHistory,
+}) {
   const [selectedTab, setSelectedTab] = useState("gastos");
 
   return (
@@ -18,8 +25,8 @@ export function InfoTabs({ data }) {
         <Card>
           <CardBody className="px-0 md:px-6 sm:px-4">
             <tabs.Expenses
-              expenses={data.expenses}
-              monthlyCabinetExpenses={data.federalDeputyMonthlyCabinetExpenses}
+              expenses={expenses}
+              monthlyCabinetExpenses={monthlyCabinetExpenses}
             />
           </CardBody>
         </Card>
@@ -27,7 +34,7 @@ export function InfoTabs({ data }) {
       <Tab key="gabinete" title="Gabinete" className="">
         <Card>
           <CardBody>
-            <tabs.Cabinet cabinetData={data.cabinetData} />
+            <tabs.Cabinet cabinetData={cabinetData} />
           </CardBody>
         </Card>
       </Tab>
@@ -35,10 +42,8 @@ export function InfoTabs({ data }) {
         <Card>
           <CardBody>
             <tabs.Videos
-              speechesData={data?.speechesData}
-              federalDeputyName={
-                data?.federalDeputyBaseInfo?.ultimoStatus?.nome
-              }
+              speechesData={speechesData}
+              federalDeputyName={baseInfo?.ultimoStatus?.nome}
             />
           </CardBody>
         </Card>
@@ -46,25 +51,21 @@ export function InfoTabs({ data }) {
       <Tab key="informacoes-pessoais" title="Informações pessoais">
         <Card>
           <CardBody>
-            <tabs.PersonalInfo
-              federalDeputyBaseInfo={data?.federalDeputyBaseInfo}
-            />
+            <tabs.PersonalInfo federalDeputyBaseInfo={baseInfo} />
           </CardBody>
         </Card>
       </Tab>
       <Tab key="historico-profissional" title="Histórico profissional">
         <Card>
           <CardBody>
-            <tabs.WorkHistory
-              federalDeputyWorkHistory={data?.federalDeputyWorkHistory}
-            />
+            <tabs.WorkHistory federalDeputyWorkHistory={workHistory} />
           </CardBody>
         </Card>
       </Tab>
       <Tab key="contato" title="Contato">
         <Card>
           <CardBody>
-            <tabs.Contact federalDeputyBaseInfo={data?.federalDeputyBaseInfo} />
+            <tabs.Contact federalDeputyBaseInfo={baseInfo} />
           </CardBody>
         </Card>
       </Tab>
