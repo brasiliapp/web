@@ -23,7 +23,6 @@ import {
   CardBody,
 } from "@nextui-org/react";
 
-import SocialMediaShare from "./SocialMediaShare";
 import DonateButton from "./DonateButton";
 
 export default function Header() {
@@ -171,18 +170,117 @@ export default function Header() {
                             vai ajudar com os custos de servidores e hospedagem.
                             Qualquer doação, por menor que seja, faz a
                             diferença. Ajude-nos a fortalecer nossa democracia.
-                            <div className="mt-4 text-center">
-                              <span className="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
-                                Doação Segura
+                            <div>
+                              <span className="text-center bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+                                Despesas atuais
                               </span>
-
-                              <DonateButton />
+                            </div>
+                            <div class="bg-white py-3 font-mono text-sm	">
+                              <ul class="space-y-2">
+                                <li class="flex justify-between">
+                                  <span>Vercel (vercel.com)</span>
+                                  <span>$10.00 / mês</span>
+                                </li>
+                                <li class="flex justify-between">
+                                  <span>Digital Ocean (digitalocean.com)</span>
+                                  <span>$25.00 / mês</span>
+                                </li>
+                              </ul>
+                            </div>
+                            <div className="mt-4 text-center">
+                              <Tabs
+                                aria-label="Options"
+                                color="#000"
+                                variant="underlined"
+                                classNames={{
+                                  tabList:
+                                    "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                                  cursor: "w-full bg-[#000]",
+                                  tab: "max-w-fit px-0 h-12",
+                                  tabContent:
+                                    "group-data-[selected=true]:text-[#000]",
+                                }}
+                              >
+                                <Tab
+                                  key="stripe"
+                                  title={
+                                    <div className="flex items-center space-x-2">
+                                      <span>Stripe</span>
+                                    </div>
+                                  }
+                                >
+                                  {" "}
+                                  <DonateButton />
+                                </Tab>
+                                <Tab
+                                  key="bitcoin"
+                                  title={
+                                    <div className="flex items-center space-x-2">
+                                      <span>Bitcoin</span>
+                                    </div>
+                                  }
+                                >
+                                  <Button
+                                    href={process.env.NEXT_PUBLIC_BITCOIN_KEY}
+                                    target="_blank"
+                                    as={Link}
+                                    color="warning"
+                                    variant="flat"
+                                  >
+                                    Doar com Bitcoin{" "}
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="800"
+                                      height="800"
+                                      viewBox="0.004 0 64 64"
+                                    >
+                                      <path
+                                        fill="#f7931a"
+                                        d="M63.04 39.741c-4.274 17.143-21.638 27.575-38.783 23.301C7.12 58.768-3.313 41.404.962 24.262 5.234 7.117 22.597-3.317 39.737.957c17.144 4.274 27.576 21.64 23.302 38.784z"
+                                      ></path>
+                                      <path
+                                        fill="#fff"
+                                        d="M46.11 27.441c.636-4.258-2.606-6.547-7.039-8.074l1.438-5.768-3.512-.875-1.4 5.616c-.922-.23-1.87-.447-2.812-.662l1.41-5.653-3.509-.875-1.439 5.766c-.764-.174-1.514-.346-2.242-.527l.004-.018-4.842-1.209-.934 3.75s2.605.597 2.55.634c1.422.355 1.68 1.296 1.636 2.042l-1.638 6.571c.098.025.225.061.365.117l-.37-.092-2.297 9.205c-.174.432-.615 1.08-1.609.834.035.051-2.552-.637-2.552-.637l-1.743 4.02 4.57 1.139c.85.213 1.683.436 2.502.646l-1.453 5.835 3.507.875 1.44-5.772c.957.26 1.887.5 2.797.726L27.504 50.8l3.511.875 1.453-5.823c5.987 1.133 10.49.676 12.383-4.738 1.527-4.36-.075-6.875-3.225-8.516 2.294-.531 4.022-2.04 4.483-5.157zM38.087 38.69c-1.086 4.36-8.426 2.004-10.807 1.412l1.928-7.729c2.38.594 10.011 1.77 8.88 6.317zm1.085-11.312c-.99 3.966-7.1 1.951-9.083 1.457l1.748-7.01c1.983.494 8.367 1.416 7.335 5.553z"
+                                      ></path>
+                                    </svg>
+                                  </Button>
+                                </Tab>
+                                <Tab
+                                  key="pix"
+                                  title={
+                                    <div className="flex items-center space-x-2">
+                                      <span>Pix</span>
+                                    </div>
+                                  }
+                                >
+                                  <Button
+                                    href={process.env.NEXT_PUBLIC_PIX_KEY}
+                                    target="_blank"
+                                    as={Link}
+                                    color="default"
+                                    variant="flat"
+                                  >
+                                    Doar com Pix{" "}
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="800"
+                                      height="800"
+                                      viewBox="0 0 16 16"
+                                    >
+                                      <path d="M11.917 11.71a2.046 2.046 0 01-1.454-.602l-2.1-2.1a.4.4 0 00-.551 0l-2.108 2.108a2.044 2.044 0 01-1.454.602h-.414l2.66 2.66c.83.83 2.177.83 3.007 0l2.667-2.668h-.253zM4.25 4.282c.55 0 1.066.214 1.454.602l2.108 2.108a.39.39 0 00.552 0l2.1-2.1a2.044 2.044 0 011.453-.602h.253L9.503 1.623a2.127 2.127 0 00-3.007 0l-2.66 2.66h.414z"></path>
+                                      <path d="M14.377 6.496l-1.612-1.612a.307.307 0 01-.114.023h-.733c-.379 0-.75.154-1.017.422l-2.1 2.1a1.005 1.005 0 01-1.425 0L5.268 5.32a1.448 1.448 0 00-1.018-.422h-.9a.306.306 0 01-.109-.021L1.623 6.496c-.83.83-.83 2.177 0 3.008l1.618 1.618a.305.305 0 01.108-.022h.901c.38 0 .75-.153 1.018-.421L7.375 8.57a1.034 1.034 0 011.426 0l2.1 2.1c.267.268.638.421 1.017.421h.733c.04 0 .079.01.114.024l1.612-1.612c.83-.83.83-2.178 0-3.008z"></path>
+                                    </svg>
+                                  </Button>
+                                </Tab>
+                              </Tabs>
                             </div>
                           </CardBody>
                         </Card>
                       </Tab>
                     </Tabs>
                   </div>
+                  Qualquer dúvida ou sugestão você pode encaminhar para contato@brasiliapp.com.br
+
                 </div>
               </ModalBody>
             </>
@@ -282,8 +380,8 @@ export default function Header() {
         </NavbarItem>
         <NavbarItem>
           <Tooltip content="Você pode fazer a diferença">
-            <Button onPress={onOpen} color="danger" variant="flat">
-              Apoie{" "}
+            <Button onPress={onOpen} color="default" variant="flat">
+              Sobre{" "}
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -291,7 +389,7 @@ export default function Header() {
                 role="presentation"
                 viewBox="0 0 24 24"
                 width="24"
-                className="text-danger animate-heartbeat"
+                className="text-danger"
                 tabIndex="-1"
               >
                 <path
