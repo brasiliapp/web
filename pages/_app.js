@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-import { GA_TRACKING_ID, pageview } from "../utils/analytics";
-import Script from "next/script";
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { GA_TRACKING_ID, pageview } from '../utils/analytics';
+import Script from 'next/script';
 
-import "../app/globals.css";
-import Head from "next/head";
+import '../app/globals.css';
+import Head from 'next/head';
 
-import { NextUIProvider } from "@nextui-org/react";
+import { NextUIProvider } from '@nextui-org/react';
 
-import posthog from "posthog-js";
-import { PostHogProvider } from "posthog-js/react";
+import posthog from 'posthog-js';
+import { PostHogProvider } from 'posthog-js/react';
 
-import { defaultSeoConfig } from "../seoConfig";
+import { defaultSeoConfig } from '../seoConfig';
 
-import Header from "@/components/Header";
+import Header from '@/components/Header';
 
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://app.posthog.com",
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com',
     // Enable debug mode in development
     loaded: (posthog) => {
-      if (process.env.NODE_ENV === "development") posthog.debug();
+      if (process.env.NODE_ENV === 'development') posthog.debug();
     },
     capture_pageview: true, // Disable automatic pageview capture, as we capture manually
   });
@@ -33,11 +33,11 @@ function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     // Track page views
-    const handleRouteChange = () => posthog?.capture("$pageview");
-    router.events.on("routeChangeComplete", handleRouteChange);
+    const handleRouteChange = () => posthog?.capture('$pageview');
+    router.events.on('routeChangeComplete', handleRouteChange);
 
     return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
+      router.events.off('routeChangeComplete', handleRouteChange);
     };
   }, []);
 
@@ -45,13 +45,15 @@ function MyApp({ Component, pageProps }) {
     const handleRouteChange = (url) => {
       pageview(url);
     };
-    router.events.on("routeChangeComplete", handleRouteChange);
+    router.events.on('routeChangeComplete', handleRouteChange);
     return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
+      router.events.off('routeChangeComplete', handleRouteChange);
     };
   }, [router.events]);
 
-  const { title, description, imageUrl, url } = defaultSeoConfig;
+  const {
+    title, description, imageUrl, url,
+  } = defaultSeoConfig;
 
   return (
     <PostHogProvider client={posthog}>
@@ -60,7 +62,7 @@ function MyApp({ Component, pageProps }) {
         <meta name="description" content={description} />
         <meta
           property="og:title"
-          content={"BrasiliApp 2023 - Gastos dos deputados federais"}
+          content="BrasiliApp 2023 - Gastos dos deputados federais"
         />
         <meta property="og:description" content={description} />
         <meta property="og:image" content={imageUrl} />
@@ -75,14 +77,14 @@ function MyApp({ Component, pageProps }) {
 
         <link
           rel="canonical"
-          href={`https://brasiliapp.com.br/deputado-federal`}
+          href="https://brasiliapp.com.br/deputado-federal"
         />
       </Head>
 
       <NextUIProvider
         disabletransitiononchange="true"
         attribute="class"
-        value={{ light: "light", dark: "dark" }}
+        value={{ light: 'light', dark: 'dark' }}
       >
         <Header />
         <div className="mx-auto w-full max-w-screen-xl">
