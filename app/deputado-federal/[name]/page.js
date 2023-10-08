@@ -63,7 +63,7 @@ export default async function FederalDeputy({ params, searchParams }) {
         <meta name="twitter:url" content={fullUrl || defaultSeoConfig.url} />
       </Head>
 
-      <main className="mt-3 z-0 flex flex-col relative justify-between rounded-large w-full">
+      <section className="mt-3 z-0 flex flex-col relative justify-between rounded-large w-full">
         <Header federalDeputyBaseInfo={data.baseInfo} />
         <InfoTabs
           expenses={data.expenses}
@@ -73,7 +73,7 @@ export default async function FederalDeputy({ params, searchParams }) {
           baseInfo={data.baseInfo}
           workHistory={data.workHistory}
         />
-      </main>
+      </section>
       <Footer />
     </>
   );

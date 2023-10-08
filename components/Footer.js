@@ -5,7 +5,7 @@ import { Tooltip, Button } from "@nextui-org/react";
 
 export function Footer() {
   return (
-    <footer className="bg-gray-100 p-10 md:mt-3 z-0 text-gray-700 flex flex-col align-center justify-center relative justify-between gap-4 bg-content1 md:rounded-large sm:rounded-none  w-full mb-16">
+    <footer className="bg-gray-100 p-10 md:mt-3 z-0 text-gray-700 flex flex-col align-center justify-center relative justify-between gap-4 bg-content1 md:rounded-large sm:rounded-none  w-full">
       <div className="container mx-auto text-center">
         <h2 className="text-4xl font-bold mb-4">Acompanhe e Compartilhe</h2>
         <Tooltip content="Siga-nos no Instagram">

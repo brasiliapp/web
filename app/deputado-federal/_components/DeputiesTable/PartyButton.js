@@ -1,4 +1,5 @@
 "use client";
+
 import { startTransition } from "react";
 
 import {
@@ -12,9 +13,9 @@ import {
 import { ChevronDownIcon } from "@/assets/ChevronDownIcon";
 
 import { capitalize } from "@/utils";
-import { uf } from "@/utils/data";
+import { parties } from "@/utils/data";
 
-export default function StatesButton({ state, setState }) {
+export default function PartyButton({ party, setParty }) {
   return (
     <Dropdown>
       <DropdownTrigger className="sm:flex">
@@ -22,7 +23,7 @@ export default function StatesButton({ state, setState }) {
           endContent={<ChevronDownIcon className="text-small" />}
           variant="flat"
         >
-          Estados
+          Partidos
         </Button>
       </DropdownTrigger>
 
@@ -30,15 +31,15 @@ export default function StatesButton({ state, setState }) {
         aria-label="state"
         disallowEmptySelection={true}
         closeOnSelect={false}
-        selectedKeys={state}
-        className="overflow-y-auto max-h-96"
+        selectedKeys={party}
         defaultSelectedKeys="all"
+        className="overflow-y-auto max-h-96"
         selectionMode="single"
         onSelectionChange={(e) => {
           if (e.currentKey === "all") {
-            return startTransition(() => setState("all"));
+            return startTransition(() => setParty("all"));
           } else {
-            return startTransition(() => setState(e));
+            return startTransition(() => setParty(e));
           }
         }}
       >
@@ -46,9 +47,9 @@ export default function StatesButton({ state, setState }) {
           TODOS
         </DropdownItem>
 
-        {uf.map((item) => (
+        {parties.map((item) => (
           <DropdownItem key={item.uid} className="capitalize">
-            {capitalize(item.name)}
+            {capitalize(item.uid)}
           </DropdownItem>
         ))}
       </DropdownMenu>

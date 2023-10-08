@@ -1,4 +1,4 @@
-import DeputiesTable from "../components/DeputiesTable";
+import { DeputiesTable } from "./_components";
 
 import { defaultSeoConfig } from "@/seoConfig";
 
@@ -30,7 +30,7 @@ async function getDeputies() {
         next: {
           revalidate: 604800, // revalidate per week
         },
-      }
+      },
     );
 
     const data = await response.json();
