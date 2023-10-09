@@ -1,5 +1,6 @@
 "use client";
-import { useState, useMemo, startTransition, useCallback } from "react";
+
+import { useState, useMemo, startTransition } from "react";
 import { ChevronRightIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 
 import Link from "next/link";
@@ -9,7 +10,7 @@ import Header from "./Header";
 
 import { getCurrentDateInfo, slugify } from "@/utils";
 
-export default function DeputiesTable({ deputies }) {
+export function DeputiesTable({ deputies }) {
   const [state, setState] = useState("all");
   const [party, setParty] = useState("all");
   const [search, setSearch] = useState("");
@@ -19,19 +20,19 @@ export default function DeputiesTable({ deputies }) {
 
     if (search) {
       result = result.filter(({ nome }) =>
-        nome.toLowerCase().includes(search.toLowerCase())
+        nome.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
     if (state !== "all") {
       result = result.filter(({ siglaUf }) =>
-        Array.from(state).includes(siglaUf)
+        Array.from(state).includes(siglaUf),
       );
     }
 
     if (party !== "all") {
       result = result.filter(({ siglaPartido }) =>
-        Array.from(party).includes(siglaPartido)
+        Array.from(party).includes(siglaPartido),
       );
     }
 

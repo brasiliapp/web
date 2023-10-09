@@ -2,7 +2,6 @@ import Script from "next/script";
 import { Inter } from "next/font/google";
 
 import Header from "@/components/Header";
-import Footer from "./components/Footer";
 
 import { GA_TRACKING_ID } from "../utils/analytics";
 
@@ -42,10 +41,12 @@ export default function RootLayout({ children }) {
     <html lang="pt-BR">
       <body className={inter.className}>
         <Header />
-
         <main className="w-full max-w-screen-xl mx-auto">{children}</main>
-
-        <Footer />
+        <div className="flex items-center justify-center w-full px-2 py-2 mt-4 mb-2">
+          <span className="text-small text-default-400">
+            Criado com amor por brasileiros.
+          </span>
+        </div>
       </body>
 
       <Script
