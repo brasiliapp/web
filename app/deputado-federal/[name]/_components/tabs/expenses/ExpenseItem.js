@@ -5,6 +5,18 @@ import {
   identifyPerson,
 } from "@/utils";
 
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Button,
+  User,
+  Divider,
+  Chip,
+} from "@nextui-org/react";
+
+const skeletonStyle = "bg-[#D4D4D866] animate-pulse";
+
 export default function ExpenseItem({
   value,
   date,
@@ -42,11 +54,71 @@ export default function ExpenseItem({
         <span>Informado em {formatDate(date)}</span>
       </time>
       <p className="mb-4 text-small font-normal text-gray-500 dark:text-gray-400">
-        {identifyPerson(supplierId).name}: {supplier}
+        {identifyPerson(supplierId).name}: {supplier}{" "}
       </p>
       <p className="mb-4 text-small font-normal text-gray-500 dark:text-gray-400">
         {identifyPerson(supplierId).name === "Empresa" ? "CNPJ" : "CPF"}:{" "}
-        {formatCPFCNPJ(supplierId)}
+        {formatCPFCNPJ(supplierId)}         <Popover placement="bottom" showArrow={true} backdrop="opaque">
+          <PopoverTrigger>
+            <Chip
+              variant="shadow"
+              classNames={{
+                base: "cursor-pointer bg-gradient-to-br from-gray-200 to-gray-500 border-small",
+                content: "drop-shadow shadow-black text-white",
+              }}
+            >
+              Verificar
+            </Chip>
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="px-1 py-2 max-w-sm">
+              <Chip size="sm" className="mt-3" color="warning" variant="flat">
+                Funcionalidade em desenvolvimento
+              </Chip>
+              <div className="text-small pt-2 font-bold text-gray-600">
+                Empresa Jabuticaba de laranja do Sul do Norte LTDA.{" "}
+              </div>
+              <div className="text-small py-2 text-gray-500">
+                <span class="font-semibold">Data de abertura:</span> 18/02/2020{" "}
+                <i>(3 anos, 7 meses e 20 dias)</i>
+              </div>
+              <div className="text-small py-2 text-gray-500">
+                <span class="font-semibold">Capital social:</span> R$ 5.000,00
+              </div>
+              <div className="text-small py-2 text-gray-500">
+                <span class="font-semibold">Sócios:</span>
+              </div>
+
+              <div
+                className={`w-full  max-w-[45%] h-5  my-1 rounded-medium ${skeletonStyle}`}
+              />
+              <div
+                className={`w-full h-5  my-1 rounded-medium ${skeletonStyle}`}
+              />
+
+              <div className="flex justify-between">
+                <div
+                  className={`w-full max-w-[48%] h-5 my-1 rounded-medium ${skeletonStyle}`}
+                />
+                <div
+                  className={`w-full max-w-[48%] h-5 my-1 rounded-medium ${skeletonStyle}`}
+                />
+              </div>
+
+              <Divider className="my-4" />
+              <p className="text-small py-2 text-gray-500">
+                Essa é a proposta de uma feature nova para trazer informações
+                das empresas e facilitar a consulta dos usuários sobre as
+                informações completas dos fornecedores.
+              </p>
+              <p className="text-small py-2 text-gray-500">
+                <i>Os dados exibidos aqui, por enquanto não são dados reais. Se você tem alguma sugestão para essa funcionalidade abra um
+                issue no github ou envie um e-mail para
+                contato@brasiliapp.com.br</i>
+              </p>
+            </div>
+          </PopoverContent>
+        </Popover>
       </p>
       <p className="mb-4 text-small font-normal text-gray-500 dark:text-gray-400">
         Tipo da despesa: {type}
