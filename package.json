@@ -6,22 +6,23 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
+  
   "dependencies": {
     "@heroicons/react": "^2.0.18",
     "@nextui-org/react": "^2.1.12",
     "autoprefixer": "10.4.15",
+    "axios": "^1.5.1",
     "chart.js": "^4.4.0",
-    "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
     "firebase": "^10.4.0",
     "framer-motion": "^10.16.4",
-    "next": "13.4.19",
+    "next": "13.5.4",
     "next-themes": "^0.2.1",
     "node-fetch": "^3.3.2",
     "pdfjs-dist": "^3.10.111",
-    "postcss": "8.4.29",
+    "postcss": "8.4.31",
     "posthog-js": "^1.81.1",
     "react": "18.2.0",
     "react-chartjs-2": "^5.2.0",
@@ -32,5 +33,26 @@
     "redux-devtools-extension": "^2.13.9",
     "redux-saga": "^1.2.3",
     "tailwindcss": "3.3.3"
-  }
+  },
+  "devDependencies": {
+    "eslint": "^8.51.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1"
+  },
+    "husky": {
+      "hooks": {
+        "pre-commit": "lint-staged"
+      }
+    },
+    "lint-staged": {
+      "*.{js,jsx,ts,tsx}": [
+        "eslint --fix",
+        "git add"
+      ]
+    }
 }

@@ -1,5 +1,6 @@
 import { DeputiesTable } from "./_components";
 
+
 import { defaultSeoConfig } from "@/seoConfig";
 
 const { title, description } = defaultSeoConfig;

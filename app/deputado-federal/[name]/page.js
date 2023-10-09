@@ -17,7 +17,7 @@ export default async function FederalDeputy({ params, searchParams }) {
   const data = await getData(
     federalDeputyNameAndId,
     monthQueryParam,
-    yearQueryParam,
+    yearQueryParam
   );
 
   const fullUrl = `https://brasiliapp.com.br/deputado-federal/${federalDeputyNameAndId}/mes=${monthQueryParam}&ano=${yearQueryParam}`;
@@ -82,7 +82,7 @@ export default async function FederalDeputy({ params, searchParams }) {
 async function getData(
   federalDeputyNameAndId,
   monthQueryParam,
-  yearQueryParam,
+  yearQueryParam
 ) {
   const getFederalDeputyDataService = new GetFederalDeputyDataService();
 
@@ -94,7 +94,7 @@ async function getData(
     getFederalDeputyDataService.fetchExpenses(
       id,
       monthQueryParam,
-      yearQueryParam,
+      yearQueryParam
     ),
   ];
 
@@ -108,30 +108,31 @@ async function getData(
   let speechesData, cabinetData;
   try {
     speechesData = await getFederalDeputyDataService.fetchSpeechesData(
-      federalDeputyNameAndId,
+      federalDeputyNameAndId
     );
-    if (speechesData?.length > 0) {
-      fetchVideos(data?.speechesData);
-    }
   } catch (error) {
     console.error("fail to get videos", error);
   }
 
   try {
     cabinetData = await getFederalDeputyDataService.fetchCabinetData(
-      federalDeputyNameAndId,
+      federalDeputyNameAndId
     );
   } catch (error) {
     console.error("fail to get cabinetData", error);
   }
 
   const monthlyCabinetExpenses = cabinetData?.data.montly_expenses.find(
-    (item) => monthQueryParam === item.month,
+    (item) => monthQueryParam === item.month
   );
 
   const total = formatMonetaryValue(
-    calculateTotal(monthExpenses.data, "valorLiquido"),
+    calculateTotal(monthExpenses?.data, "valorLiquido")
   );
+
+  if (speechesData?.data.length > 0 && !monthQueryParam && !yearQueryParam) {
+    fetchVideos(speechesData?.data);
+  }
 
   /** Improve SEO titles and descriptions method, make it external as well */
   const seoDates = getDateForSEO(monthQueryParam, yearQueryParam);
@@ -141,17 +142,17 @@ async function getData(
     suffix,
     baseInfo.data,
     total,
-    seoDates,
+    seoDates
   );
 
   return {
     cabinetData: cabinetData.data ?? [],
     description: seoDescription,
-    expenses: monthExpenses.data,
-    baseInfo: baseInfo.data,
-    workHistory: workHistory.data,
+    expenses: monthExpenses?.data,
+    baseInfo: baseInfo?.data,
+    workHistory: workHistory?.data,
     monthlyCabinetExpenses: monthlyCabinetExpenses ?? null,
-    speechesData: speechesData.data ?? [],
+    speechesData: speechesData?.data ?? [],
     title: seoTitle,
   };
 }
@@ -159,7 +160,7 @@ async function getData(
 function getDateForSEO(monthInMM, yearInYYYY) {
   const monthForSEO = new Date(`${monthInMM}-30-${yearInYYYY}`).toLocaleString(
     "pt-BR",
-    { month: "long" },
+    { month: "long" }
   );
   const yearForSEO = yearInYYYY;
 
@@ -173,7 +174,7 @@ function getSEOTitleAndDescription(
   genderSuffix,
   federalDeputyBaseInfo,
   federalDeputyTotalMonthlyExpenses,
-  seoDates,
+  seoDates
 ) {
   const title = `Gastos d${genderSuffix} deputad${genderSuffix} Federal
 ${federalDeputyBaseInfo?.ultimoStatus?.nome} você confere aqui no BrasiliApp`;
