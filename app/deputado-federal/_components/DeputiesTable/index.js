@@ -4,7 +4,9 @@ import { useState, useMemo, startTransition } from "react";
 import { ChevronRightIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
+import {Image} from "@nextui-org/react";
+
 
 import Header from "./Header";
 
