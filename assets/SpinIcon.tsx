@@ -1,5 +1,3 @@
-import React from "react";
-
 export const SpinIcon = ({ strokeWidth = 1.5, ...otherProps }) => (
   <svg
     aria-hidden="true"
