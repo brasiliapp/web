@@ -1,4 +1,4 @@
-import type { Expense } from "@/interfaces";
+import type { Expense, Speech, VideoLink } from "@/interfaces";
 import type { Cpf, Cnpj } from "@/types";
 
 import axios from "axios";
@@ -150,29 +150,23 @@ export function checkNullObject(obj: Object): boolean {
 }
 
 // this function is needed to be called in order to bypass Camara's media provider (.mp4 url)
-export async function fetchVideos(video_links) {
-  console.log("Trying fetch videos", video_links);
-  video_links.forEach((item) => {
-    if (item.video_links.length > 0) {
-      item.video_links.forEach(async (videoLink) => {
-        const url = `https://www.camara.leg.br/evento-legislativo/${item.evento_id}/?${videoLink.video_param}&trechosOrador=${item.deputado}&crawl=no`;
+export async function fetchVideos(speeches: Speech[]) {
+  speeches.forEach((speech: Speech) => {
+    if (speech.video_links.length > 0) {
+      speech.video_links.forEach(async (videoLink: VideoLink) => {
+        const url = `https://www.camara.leg.br/evento-legislativo/${speech.evento_id}/?${videoLink.video_param}&trechosOrador=${speech.deputado}&crawl=no`;
 
         setTimeout(async () => {
           await axios
             .get(url)
-            .then((response) => {
-              console.log("tetando pegar o video ===> ".url);
-
-              if (!response.ok) {
-                console.log("Network response was not ok ===> ".url);
-              }
-              return response.text();
+            .then((_) => {
+              console.log("tentando pegar o video ===> ", url);
             })
-            .then((data) => {
+            .then((_) => {
               console.log("processou ==> ", url);
             })
-            .catch((error) => {
-              console.log("erro fetching response was not ok ===> ".url);
+            .catch((_) => {
+              console.log("erro fetching response was not ok ===> ", url);
             });
         }, 249);
       });

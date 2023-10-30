@@ -6,7 +6,6 @@ export class GetFederalDeputyDataService extends FederalDeputiesAPI {
       `deputados/${id}`,
     );
 
-
     if (!response.ok) {
       console.error("Failed to fetch Federal Deputy base data:", response);
       throw new Error("Failed to fetch Federal Deputy base data");
