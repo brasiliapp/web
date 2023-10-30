@@ -29,7 +29,7 @@ export class GetFederalDeputyDataService extends FederalDeputiesAPI {
     return { data: data.dados, status: response.status };
   }
 
-  async fetchExpenses(id, monthInMM, yearInYYYY) {
+  async fetchExpenses({ id, monthInMM, yearInYYYY }) {
     const response = await this._chamberOfDeputiesAPIInstance.get(
       `deputados/${id}/despesas?idLegislatura=57&ano=${yearInYYYY}&mes=${monthInMM}`,
     );

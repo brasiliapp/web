@@ -10,7 +10,7 @@ import {Image} from "@nextui-org/react";
 
 import Header from "./Header";
 
-import { getCurrentDateInfo, slugify } from "@/utils";
+import { slugify } from "@/utils";
 
 export function DeputiesTable({ deputies }) {
   const [state, setState] = useState("all");
@@ -48,12 +48,9 @@ export function DeputiesTable({ deputies }) {
   }
 
   const renderRow = (deputy) => {
-    const { numericMonth, year } = getCurrentDateInfo();
-    const queryParams = `mes=${numericMonth}&ano=${year}`;
-
     const navigateTo = `/deputado-federal/${slugify(deputy.nome)}-${
       deputy.id
-    }?${queryParams}`;
+    }`;
 
     return (
       <li key={deputy.nome}>
