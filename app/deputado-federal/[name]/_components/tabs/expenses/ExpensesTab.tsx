@@ -7,7 +7,7 @@ import { CircularProgress, Divider } from "@nextui-org/react";
 import ExpenseCategories from "./ExpenseCategories";
 import ExpenseItem from "./ExpenseItem";
 import { MonthChanger } from "./MonthChanger";
-import { calculateTotal, formatMonetaryValue } from "@/utils";
+import { getTotalExpense, formatMonetaryValue } from "@/utils";
 
 export function ExpensesTab({
   expenses,
@@ -40,7 +40,7 @@ export function ExpensesTab({
           <p className="mx-4 text-lg text-center mt-5">Gastou</p>
           <div className="flex items-center justify-center ">
             <p className="text-4xl font-bold">
-              {formatMonetaryValue(calculateTotal(expenses, "valorLiquido"))}
+              {formatMonetaryValue(getTotalExpense(expenses))}
             </p>
           </div>
         </>

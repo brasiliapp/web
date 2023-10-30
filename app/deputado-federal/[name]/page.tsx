@@ -5,7 +5,7 @@ import { Footer } from "@/components";
 import { defaultSeoConfig } from "@/seoConfig";
 import { GetFederalDeputyDataService } from "@/services";
 import {
-  calculateTotal,
+  getTotalExpense,
   fetchVideos,
   formatMonetaryValue,
   getGenderSuffix,
@@ -127,7 +127,7 @@ async function getData(
   );
 
   const total = formatMonetaryValue(
-    calculateTotal(monthExpenses?.data, "valorLiquido")
+    getTotalExpense(monthExpenses?.data)
   );
 
   if (speechesData?.data.length > 0 && !monthQueryParam && !yearQueryParam) {

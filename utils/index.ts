@@ -1,10 +1,13 @@
-import axios from 'axios';
+import type { Expense } from "@/interfaces";
+import type { Cpf, Cnpj } from "@/types";
 
-export function capitalize(str) {
+import axios from "axios";
+
+export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function calculateAge(birthDate) {
+export function calculateAge(birthDate: Date): number {
   const currentDate = new Date();
   const birthYear = new Date(birthDate).getFullYear();
   const currentYear = currentDate.getFullYear();
@@ -17,8 +20,8 @@ export function calculateAge(birthDate) {
   const currentDay = currentDate.getDate();
 
   if (
-    currentMonth < birthMonth
-    || (currentMonth === birthMonth && currentDay < birthDay)
+    currentMonth < birthMonth ||
+    (currentMonth === birthMonth && currentDay < birthDay)
   ) {
     age--;
   }
@@ -26,11 +29,17 @@ export function calculateAge(birthDate) {
   return age;
 }
 
-export function getCurrentDateInfo() {
+export function getCurrentDateInfo(): {
+  numericMonth: number;
+  longMonth: string;
+  year: number;
+} {
   const currentDate = new Date();
 
-  const numericMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-  const longMonth = currentDate.toLocaleString('pt-BR', { month: 'long' });
+  const numericMonth = parseInt(
+    (currentDate.getMonth() + 1).toString().padStart(2, "0"),
+  );
+  const longMonth = currentDate.toLocaleString("pt-BR", { month: "long" });
   const year = currentDate.getFullYear();
 
   return {
@@ -40,100 +49,98 @@ export function getCurrentDateInfo() {
   };
 }
 
-export function getGenderSuffix(gender) {
+export function getGenderSuffix(gender: string): "a" | "o" {
   const normalizedGender = gender.toLowerCase();
 
-  if (normalizedGender === 'm') {
-    return 'o';
-  } if (normalizedGender === 'f') {
-    return 'a';
-  }
+  return normalizedGender === "m" ? "o" : "a";
 }
 
-export function formatMonetaryValue(value) {
-  const formattedValue = new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
+export function formatMonetaryValue(value: number): `R$ ${number}` {
+  const formattedValue = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
   }).format(value);
 
-  return formattedValue;
+  return formattedValue as `R$ ${number}`;
 }
 
-export function formatDate(dateString) {
+export function formatDate(
+  dateString: string,
+): "Invalid Date" | `${number}/${number}/${number}` {
   const date = new Date(dateString);
 
   if (isNaN(date.getTime())) {
-    return 'Invalid Date';
+    return "Invalid Date";
   }
 
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const year = date.getFullYear();
   const formattedDate = `${day}/${month}/${year}`;
 
-  return formattedDate;
+  return formattedDate as `${number}/${number}/${number}`;
 }
 
-export function calculateTotal(items, costPropertyName) {
-  const totalCost = items?.reduce((accumulator, item) => {
-    const cost = item[costPropertyName];
+export function getTotalExpense(expenses: Expense[]): number {
+  const totalCost = expenses.reduce((accumulator: number, expense: Expense) => {
+    const cost = expense["valorLiquido"];
 
-    if (typeof cost === 'number' && !isNaN(cost)) {
-      return accumulator + cost;
-    }
-    return accumulator;
+    return accumulator + cost;
   }, 0);
 
   return totalCost;
 }
 
-export function formatCPFCNPJ(numbers) {
-  const numericInput = numbers.replace(/\D/g, '');
+export function formatCPFCNPJ(numbers: string): Cpf | Cnpj | "Não informado" {
+  const numericInput = numbers.replace(/\D/g, "");
 
   if (numericInput.length === 11) {
-    return numericInput.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-  } if (numericInput.length === 14) {
+    return numericInput.replace(
+      /(\d{3})(\d{3})(\d{3})(\d{2})/,
+      "$1.$2.$3-$4",
+    ) as Cpf;
+  }
+  if (numericInput.length === 14) {
     return numericInput.replace(
       /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-      '$1.$2.$3/$4-$5',
-    );
+      "$1.$2.$3/$4-$5",
+    ) as Cnpj;
   }
-  return 'Não informado';
+  return "Não informado";
 }
 
-export function identifyPerson(numbers) {
-  const numericInput = numbers.replace(/\D/g, '');
+export function identifyPerson(
+  numbers: Cpf | Cnpj,
+): "Pessoa Física" | "Empresa" {
+  const numericInput = numbers.replace(/\D/g, "");
 
-  if (numericInput.length === 11) {
-    return { name: 'Pessoa Física', type: 1 };
-  } if (numericInput.length === 14) {
-    return { name: 'Empresa', type: 0 };
-  }
-  return { name: 'Empresa', type: 0 };
+  return numericInput.length === 11 ? "Pessoa Física" : "Empresa";
 }
 
-export function slugify(text) {
+export function slugify(text: string): string {
   return text
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-export function formatPhoneNumberDf(input) {
-  const cleaned = input.replace(/\D/g, '');
+export function getFormatedPhoneNumber(
+  phoneNumber: `${number}-${number}` | `${number}`,
+): `(61) ${number}` {
+  const cleaned = phoneNumber.replace(/\D/g, "");
 
-  const formatted = cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+  const formatted = cleaned.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
 
-  if (!formatted.startsWith('(61) ')) {
-    return `(61) ${formatted}`;
+  if (!formatted.startsWith("(61) ")) {
+    return `(61) ${formatted}` as `(61) ${number}`;
   }
 
-  return formatted;
+  return formatted as `(61) ${number}`;
 }
 
-export function checkNullObject(obj) {
+export function checkNullObject(obj: Object): boolean {
   for (const key in obj) {
     if (obj[key] !== null) {
       return false;
@@ -142,46 +149,11 @@ export function checkNullObject(obj) {
   return true;
 }
 
-export function propertyValuesArray(arr, propertyKey, type) {
-  if (!Array.isArray(arr)) {
-    throw new TypeError('First argument must be an array');
-  }
-  if (typeof propertyKey !== 'string') {
-    throw new TypeError('Second argument must be a string');
-  }
-
-  return arr
-    .map((obj) => {
-      if (obj && typeof obj === 'object' && obj.hasOwnProperty(propertyKey)) {
-        if (type === 'number') {
-          return Number(obj[propertyKey]);
-        }
-        return String(obj[propertyKey]);
-      }
-      return null;
-    })
-    .filter((value) => value !== null);
-}
-
-export function findFirstMp4Url(data) {
-  for (let i = 0; i < data.length; i++) {
-    const videoLinks = data[i].video_links;
-
-    for (let j = 0; j < videoLinks.length; j++) {
-      if (videoLinks[j].mp4_url) {
-        return videoLinks[j].mp4_url;
-      }
-    }
-  }
-
-  return null;
-}
-
 // this function is needed to be called in order to bypass Camara's media provider (.mp4 url)
 export async function fetchVideos(video_links) {
-  console.log('Trying fetch videos', video_links);
+  console.log("Trying fetch videos", video_links);
   video_links.forEach((item) => {
-    if (Array.isArray(item.video_links) && item.video_links.length > 0) {
+    if (item.video_links.length > 0) {
       item.video_links.forEach(async (videoLink) => {
         const url = `https://www.camara.leg.br/evento-legislativo/${item.evento_id}/?${videoLink.video_param}&trechosOrador=${item.deputado}&crawl=no`;
 
@@ -189,18 +161,18 @@ export async function fetchVideos(video_links) {
           await axios
             .get(url)
             .then((response) => {
-              console.log('tetando pegar o video ===> '.url);
+              console.log("tetando pegar o video ===> ".url);
 
               if (!response.ok) {
-                console.log('Network response was not ok ===> '.url);
+                console.log("Network response was not ok ===> ".url);
               }
               return response.text();
             })
             .then((data) => {
-              console.log('processou ==> ', url);
+              console.log("processou ==> ", url);
             })
             .catch((error) => {
-              console.log('erro fetching response was not ok ===> '.url);
+              console.log("erro fetching response was not ok ===> ".url);
             });
         }, 249);
       });
@@ -208,16 +180,16 @@ export async function fetchVideos(video_links) {
   });
 }
 
-export function getCapitalizedPhrase(phrase) {
-  const wordsFromPhrase = phrase.split(' ');
+export function getCapitalizedPhrase(phrase: string): string {
+  const wordsFromPhrase = phrase.split(" ");
 
   const capitalizedPhrase = wordsFromPhrase
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+    .join(" ");
 
   return capitalizedPhrase;
 }
 
-export function removeDotsFromPhrase(phrase) {
-  return phrase.replaceAll('.', '');
+export function removeDotsFromPhrase(phrase: string): string {
+  return phrase.replaceAll(".", "");
 }

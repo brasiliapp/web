@@ -1,4 +1,4 @@
-import { formatPhoneNumberDf } from "@/utils";
+import { getFormatedPhoneNumber } from "@/utils";
 
 export function ContactTab({ federalDeputyBaseInfo }) {
   return (
@@ -42,14 +42,14 @@ export function ContactTab({ federalDeputyBaseInfo }) {
                     Telefone
                   </p>
                   <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                    {formatPhoneNumberDf(
+                    {getFormatedPhoneNumber(
                       federalDeputyBaseInfo?.ultimoStatus?.gabinete?.telefone,
                     )}
                   </p>
                 </div>
 
                 <a
-                  href={`tel:+55${formatPhoneNumberDf(
+                  href={`tel:+55${getFormatedPhoneNumber(
                     federalDeputyBaseInfo?.ultimoStatus?.gabinete?.telefone.replace(
                       /\D/g,
                       "",
