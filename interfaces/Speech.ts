@@ -1,8 +1,3 @@
-export interface VideoLink {
-  video_param: string;
-  mp4_url: string;
-}
-
 export interface Speech {
   deputado: string;
   sessao: string;
@@ -14,3 +9,9 @@ export interface Speech {
   evento_id: number;
   video_links: VideoLink[];
 }
+
+export interface VideoLink {
+  video_param: string;
+  mp4_url: string;
+}
+

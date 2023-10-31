@@ -90,8 +90,9 @@ async function getData(
 
   const id = federalDeputyNameAndId.split("-").at(-1);
 
-  const doQueryParamsExists = monthQueryParam && yearQueryParam;
   const { numericMonth, year } = getCurrentDateInfo();
+
+  const doQueryParamsExists = monthQueryParam && yearQueryParam;
   const fetchExpensesArgs = doQueryParamsExists
     ? { id: id, monthInMM: monthQueryParam, yearInYYYY: yearQueryParam }
     : { id: id, monthInMM: numericMonth, yearInYYYY: year };

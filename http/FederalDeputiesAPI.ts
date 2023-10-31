@@ -1,16 +1,15 @@
+import type { Response } from "node-fetch";
+
 import fetch from "node-fetch";
 
-export class FederalDeputiesAPI {
-  constructor() {
-    if (new.target === FederalDeputiesAPI) {
-      throw new Error("FederalDeputiesAPI is an abstract class");
-    }
+export abstract class FederalDeputiesAPI {
+  private baseUrl: string;
 
-    this._baseUrl = "https://dadosabertos.camara.leg.br/api/v2";
-    this._chamberOfDeputiesAPIInstance = this;
+  constructor() {
+    this.baseUrl = "https://dadosabertos.camara.leg.br/api/v2";
   }
 
-  async get(endpoint) {
-    return fetch(`${this._baseUrl}/${endpoint}`);
+  async get(endpoint: string): Promise<Response> {
+    return fetch(`${this.baseUrl}/${endpoint}`);
   }
 }
