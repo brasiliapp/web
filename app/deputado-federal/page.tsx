@@ -1,6 +1,6 @@
+import type { FederalDeputyPoliticalInfo } from "@/interfaces";
+
 import { DeputiesTable } from "./_components";
-
-
 import { defaultSeoConfig } from "@/seoConfig";
 
 const { title, description } = defaultSeoConfig;
@@ -21,9 +21,9 @@ export const metadata = {
   },
 };
 
-async function getDeputies() {
-  let deputies = [];
-
+async function getFederalDeputiesPoliticalInfo(): Promise<
+  FederalDeputyPoliticalInfo[]
+> {
   try {
     const response = await fetch(
       "https://pub-091f86d833a34a79891548ea8b1cb0ac.r2.dev/deputados.json",
@@ -34,18 +34,19 @@ async function getDeputies() {
       },
     );
 
-    const data = await response.json();
+    const data = (await response.json()) as FederalDeputyPoliticalInfo[];
+    const deputies = data.filter((deputy) => deputy.email !== null);
 
-    deputies = data.filter((deputy) => deputy.email !== null);
+    return deputies;
   } catch (error) {
     console.error("fail to get deputies => ", error);
+    return [];
   }
-
-  return deputies;
 }
 
 export default async function Page() {
-  const deputies = await getDeputies();
+  const deputies: FederalDeputyPoliticalInfo[] =
+    await getFederalDeputiesPoliticalInfo();
 
   return (
     <>

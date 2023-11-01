@@ -1,4 +1,5 @@
-"use client";
+import type { Dispatch, SetStateAction } from "react";
+import type { Selection } from "@nextui-org/react";
 
 import { startTransition } from "react";
 
@@ -15,7 +16,12 @@ import { ChevronDownIcon } from "@/assets/ChevronDownIcon";
 import { capitalize } from "@/utils";
 import { uf } from "@/utils/data";
 
-export default function StatesButton({ state, setState }) {
+interface Props {
+  state: Selection;
+  setState: Dispatch<SetStateAction<Selection>>;
+}
+
+export default function StatesButton({ state, setState }: Props) {
   return (
     <Dropdown>
       <DropdownTrigger className="sm:flex">
@@ -35,7 +41,7 @@ export default function StatesButton({ state, setState }) {
         className="overflow-y-auto max-h-96"
         defaultSelectedKeys="all"
         selectionMode="single"
-        onSelectionChange={(e) => {
+        onSelectionChange={(e: any) => {
           if (e.currentKey === "all") {
             return startTransition(() => setState("all"));
           } else {

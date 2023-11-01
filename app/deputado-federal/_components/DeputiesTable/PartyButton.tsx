@@ -1,4 +1,5 @@
-"use client";
+import type { Dispatch, SetStateAction } from "react";
+import type { Selection } from "@nextui-org/react";
 
 import { startTransition } from "react";
 
@@ -15,7 +16,12 @@ import { ChevronDownIcon } from "@/assets/ChevronDownIcon";
 import { capitalize } from "@/utils";
 import { parties } from "@/utils/data";
 
-export default function PartyButton({ party, setParty }) {
+interface Props {
+  party: Selection;
+  setParty: Dispatch<SetStateAction<Selection>>;
+}
+
+export default function PartyButton({ party, setParty }: Props) {
   return (
     <Dropdown>
       <DropdownTrigger className="sm:flex">
@@ -35,7 +41,7 @@ export default function PartyButton({ party, setParty }) {
         defaultSelectedKeys="all"
         className="overflow-y-auto max-h-96"
         selectionMode="single"
-        onSelectionChange={(e) => {
+        onSelectionChange={(e: any) => {
           if (e.currentKey === "all") {
             return startTransition(() => setParty("all"));
           } else {

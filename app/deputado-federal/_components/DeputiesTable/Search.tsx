@@ -1,10 +1,13 @@
-"use client";
-
 import { Input } from "@nextui-org/react";
 
 import { SearchIcon } from "@/assets/SearchIcon";
 
-export default function Search({ filterValue, onSearchChange }) {
+interface Props {
+  filterValue: string;
+  onSearchChange: (value: string) => void;
+}
+
+export default function Search({ filterValue, onSearchChange }: Props) {
   return (
     <Input
       isClearable

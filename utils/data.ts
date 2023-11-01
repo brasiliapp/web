@@ -1,3 +1,5 @@
+import type { PoliticalParty } from "@/interfaces";
+
 const columns = [
   { name: 'ID', uid: 'id' },
   { name: 'NOME', uid: 'nome' },
@@ -39,7 +41,7 @@ const uf = [
   { name: 'Tocantins', uid: 'TO' },
 ];
 
-const parties = [
+const parties: PoliticalParty[] = [
   {
     id: 36898,
     uid: 'AVANTE',

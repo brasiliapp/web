@@ -1,6 +1,11 @@
 import type { Cabinet, CabinetResponse, Secretary } from "./Cabinet";
+import type {
+  FederalDeputy,
+  FederalDeputyPoliticalInfo,
+  FederalDeputyLink,
+} from "./FederalDeputy";
 import type { Expense } from "./Expense";
-import type { FederalDeputy, Link } from "./FederalDeputy";
+import type { PoliticalParty } from "./PoliticalParty";
 import type { Speech, VideoLink } from "./Speech";
 import type { WorkHistory } from "./WorkHistory";
 
@@ -9,7 +14,9 @@ export type {
   CabinetResponse,
   Expense,
   FederalDeputy,
-  Link,
+  FederalDeputyLink,
+  FederalDeputyPoliticalInfo,
+  PoliticalParty,
   Secretary,
   Speech,
   VideoLink,
