@@ -1,5 +1,4 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { Selection } from "@nextui-org/react";
 
 import Search from "./Search";
 import PartyButton from "./PartyButton";
@@ -8,11 +7,11 @@ import StatesButton from "./StatesButton";
 interface Props {
   numberOfDeputies: number;
   onSearchChange: (value: string) => void;
-  party: Selection;
+  party: any;
   searchValue: string;
-  setParty: Dispatch<SetStateAction<Selection>>;
-  setState: Dispatch<SetStateAction<Selection>>;
-  state: Selection;
+  setParty: Dispatch<SetStateAction<any>>;
+  setState: Dispatch<SetStateAction<any>>;
+  state: any;
 }
 
 export default function Header({

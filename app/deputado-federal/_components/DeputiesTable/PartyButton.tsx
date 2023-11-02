@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { Selection } from "@nextui-org/react";
+import type { PoliticalParty } from "@/interfaces";
 
 import { startTransition } from "react";
 
@@ -12,8 +13,6 @@ import {
 } from "@nextui-org/react";
 
 import { ChevronDownIcon } from "@/assets/ChevronDownIcon";
-
-import { capitalize } from "@/utils";
 import { parties } from "@/utils/data";
 
 interface Props {
@@ -49,16 +48,17 @@ export default function PartyButton({ party, setParty }: Props) {
           }
         }}
       >
-        <DropdownItem key="all" className="capitalize">
-          TODOS
-        </DropdownItem>
-
-        {parties.map((item) => (
+        {buttonOptions.map((item) => (
           <DropdownItem key={item.uid} className="capitalize">
-            {capitalize(item.uid)}
+            {item.uid === "all" ? item.name : item.uid}
           </DropdownItem>
         ))}
       </DropdownMenu>
     </Dropdown>
   );
 }
+
+const buttonOptions: PoliticalParty[] = [
+  { id: -1, uid: "all", name: "TODOS", uri: "" },
+  ...parties,
+];

@@ -7,6 +7,7 @@ import type {
 import type { Expense } from "./Expense";
 import type { PoliticalParty } from "./PoliticalParty";
 import type { Speech, VideoLink } from "./Speech";
+import type { Uf } from "./Uf";
 import type { WorkHistory } from "./WorkHistory";
 
 export type {
@@ -19,6 +20,7 @@ export type {
   PoliticalParty,
   Secretary,
   Speech,
+  Uf,
   VideoLink,
   WorkHistory,
 };

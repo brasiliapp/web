@@ -1,4 +1,5 @@
 import type { PoliticalParty } from "@/interfaces";
+import type { Uf } from "@/interfaces";
 
 const columns = [
   { name: 'ID', uid: 'id' },
@@ -11,7 +12,7 @@ const columns = [
   { name: 'AÇÕES', uid: 'actions' },
 ];
 
-const uf = [
+const ufs: Uf[] = [
   { name: 'Acre', uid: 'AC' },
   { name: 'Alagoas', uid: 'AL' },
   { name: 'Amapá', uid: 'AP' },
@@ -168,4 +169,4 @@ const salaries = [
   { type: 'SP25', value: 'R$ 12.126,54' },
 ];
 
-export { columns, uf, parties };
+export { columns, ufs, parties };
