@@ -12,7 +12,7 @@ import { FederalDeputiesAPI } from "@/http";
 export class GetFederalDeputyDataService extends FederalDeputiesAPI {
   async fetchBaseData(
     id: number,
-  ): Promise<{ data: FederalDeputy[]; status: number }> {
+  ): Promise<{ data: FederalDeputy; status: number }> {
     const response = await this.get(`deputados/${id}`);
 
     if (!response.ok) {
@@ -20,7 +20,7 @@ export class GetFederalDeputyDataService extends FederalDeputiesAPI {
       throw new Error("Failed to fetch Federal Deputy base data");
     }
 
-    const data = (await response.json()) as { dados: FederalDeputy[] };
+    const data = (await response.json()) as { dados: FederalDeputy };
     return { data: data.dados, status: response.status };
   }
 

@@ -9,9 +9,11 @@ export interface FederalDeputy extends FederalDeputyPoliticalInfo {
   sexo: string;
   ufNascimento: string;
   ultimoStatus: {
+    nome: string;
     condicaoEleitoral: string;
     data: string;
     descricaoStatus: string;
+    urlFoto: string;
     gabinete: {
       andar: string;
       email: string;

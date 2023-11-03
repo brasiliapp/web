@@ -1,3 +1,12 @@
+import type {
+  Cabinet,
+  Expense,
+  FederalDeputy,
+  MonthlyExpense,
+  Speech,
+  WorkHistory,
+} from "@/interfaces";
+
 import Head from "next/head";
 
 import { Header, InfoTabs } from "./_components";
@@ -82,13 +91,22 @@ export default async function FederalDeputy({ params, searchParams }) {
 }
 
 async function getData(
-  federalDeputyNameAndId,
-  monthQueryParam,
-  yearQueryParam,
-) {
+  federalDeputyNameAndId: string,
+  monthQueryParam: number | undefined,
+  yearQueryParam: number | undefined,
+): Promise<{
+  cabinetData: Cabinet | never[];
+  description: string;
+  expenses: Expense[] | undefined;
+  baseInfo: FederalDeputy | undefined;
+  workHistory: WorkHistory[] | undefined;
+  monthlyCabinetExpenses: MonthlyExpense | null;
+  speechesData: Speech[];
+  title: string;
+}> {
   const getFederalDeputyDataService = new GetFederalDeputyDataService();
 
-  const id = federalDeputyNameAndId.split("-").at(-1);
+  const id = parseInt(federalDeputyNameAndId.split("-").at(-1)!);
 
   const { numericMonth, year } = getCurrentDateInfo();
 
@@ -103,14 +121,29 @@ async function getData(
     getFederalDeputyDataService.fetchExpenses(fetchExpensesArgs),
   ];
 
-  const [baseInfoResp, workHistoryResp, monthExpensesResp] =
-    await Promise.allSettled(fetchPromises);
+  const promisesResults = await Promise.allSettled(fetchPromises);
 
-  const baseInfo = baseInfoResp.value;
-  const workHistory = workHistoryResp.value;
-  const monthExpenses = monthExpensesResp.value;
+  let baseInfo: FederalDeputy | undefined;
+  let workHistory: WorkHistory[] | undefined;
+  let monthExpenses: Expense[] | undefined;
 
-  let speechesData, cabinetData;
+  for (let i = 0; i < promisesResults.length; ++i) {
+    const result = promisesResults[i];
+
+    if (isPromiseFulfilled(result)) {
+      const data = result.value.data;
+
+      if (i === 0) {
+        baseInfo = data as FederalDeputy;
+      } else if (i === 1) {
+        workHistory = data as WorkHistory[];
+      } else if (i === 2) {
+        monthExpenses = data as Expense[];
+      }
+    }
+  }
+
+  let speechesData: { data: Speech[]; status: number } | undefined;
   try {
     speechesData = await getFederalDeputyDataService.fetchSpeechesData(
       federalDeputyNameAndId,
@@ -119,50 +152,58 @@ async function getData(
     console.error("fail to get videos", error);
   }
 
-  if (speechesData?.data.length > 0 && !monthQueryParam && !yearQueryParam) {
-    fetchVideos(speechesData?.data);
+  if (speechesData!.data.length > 0 && !monthQueryParam && !yearQueryParam) {
+    fetchVideos(speechesData!.data);
   }
 
+  let cabinetData: Cabinet | undefined;
   try {
-    cabinetData = await getFederalDeputyDataService.fetchCabinetData(
+    const cabinetDataResp = await getFederalDeputyDataService.fetchCabinetData(
       federalDeputyNameAndId,
     );
+    cabinetData = cabinetDataResp.data;
   } catch (error) {
     console.error("fail to get cabinetData", error);
   }
 
-  const monthlyCabinetExpenses = cabinetData?.data.montly_expenses.find(
-    (item) => monthQueryParam === item.month,
+  const monthlyCabinetExpenses = cabinetData!.montly_expenses.find(
+    (item: MonthlyExpense) => monthQueryParam === item.month,
   );
 
-  const total = formatMonetaryValue(getTotalExpense(monthExpenses?.data));
+  const total = formatMonetaryValue(getTotalExpense(monthExpenses!));
 
   /** Improve SEO titles and descriptions method, make it external as well */
   const seoDates = doQueryParamsExists
     ? getDateForSEO(monthQueryParam, yearQueryParam)
     : getDateForSEO(numericMonth, year);
-  const suffix = getGenderSuffix(baseInfo.data.sexo);
+  const suffix = getGenderSuffix(baseInfo!.sexo);
 
   const { seoTitle, seoDescription } = getSEOTitleAndDescription(
     suffix,
-    baseInfo.data,
+    baseInfo!,
     total,
     seoDates,
   );
 
   return {
-    cabinetData: cabinetData.data ?? [],
+    cabinetData: cabinetData ?? [],
     description: seoDescription,
-    expenses: monthExpenses?.data,
-    baseInfo: baseInfo?.data,
-    workHistory: workHistory?.data,
+    expenses: monthExpenses,
+    baseInfo: baseInfo,
+    workHistory: workHistory,
     monthlyCabinetExpenses: monthlyCabinetExpenses ?? null,
     speechesData: speechesData?.data ?? [],
     title: seoTitle,
   };
 }
 
-function getDateForSEO(monthInMM, yearInYYYY) {
+function isPromiseFulfilled<T>(
+  input: PromiseSettledResult<T>,
+): input is PromiseFulfilledResult<T> {
+  return input.status === "fulfilled";
+}
+
+function getDateForSEO(monthInMM: number, yearInYYYY: number) {
   const monthForSEO = new Date(`${monthInMM}-30-${yearInYYYY}`).toLocaleString(
     "pt-BR",
     { month: "long" },
@@ -176,10 +217,10 @@ function getDateForSEO(monthInMM, yearInYYYY) {
 }
 
 function getSEOTitleAndDescription(
-  genderSuffix,
-  federalDeputyBaseInfo,
-  federalDeputyTotalMonthlyExpenses,
-  seoDates,
+  genderSuffix: "a" | "o",
+  federalDeputyBaseInfo: FederalDeputy,
+  federalDeputyTotalMonthlyExpenses: `R$ ${number}`,
+  seoDates: { month: string; year: number },
 ) {
   const title = `Gastos d${genderSuffix} deputad${genderSuffix} Federal
 ${federalDeputyBaseInfo?.ultimoStatus?.nome} você confere aqui no BrasiliApp`;
