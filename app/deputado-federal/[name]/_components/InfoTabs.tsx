@@ -1,9 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import type {
+  Cabinet,
+  Expense,
+  FederalDeputy,
+  MonthlyExpense,
+  Speech,
+  WorkHistory,
+} from "@/interfaces";
+
+import { Key, useState } from "react";
 import { Tab, Tabs, Card, CardBody } from "@nextui-org/react";
 
 import { tabs } from "./tabs";
+
+interface Props {
+  expenses: Expense[];
+  monthlyCabinetExpenses: MonthlyExpense[];
+  cabinetData: Cabinet;
+  speechesData: Speech[];
+  baseInfo: FederalDeputy;
+  workHistory: WorkHistory[];
+}
 
 export function InfoTabs({
   expenses,
@@ -12,14 +30,14 @@ export function InfoTabs({
   speechesData,
   baseInfo,
   workHistory,
-}) {
-  const [selectedTab, setSelectedTab] = useState("gastos");
+}: Props) {
+  const [selectedTab, setSelectedTab] = useState<Key>("gastos");
 
   return (
     <Tabs
       aria-label="Options"
       selectedKey={selectedTab}
-      onSelectionChange={setSelectedTab}
+      onSelectionChange={(key: Key) => setSelectedTab(key)}
     >
       <Tab key="despesas" title="Despesas" className="">
         <Card>

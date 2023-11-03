@@ -12,7 +12,6 @@ import { getTotalExpense, formatMonetaryValue } from "@/utils";
 export function ExpensesTab({
   expenses,
   monthlyCabinetExpenses,
-  openExpenseHandler,
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState({
@@ -101,7 +100,6 @@ export function ExpensesTab({
                     supplier={expense.nomeFornecedor}
                     supplierId={expense.cnpjCpfFornecedor}
                     document={expense.urlDocumento}
-                    handleOpen={openExpenseHandler}
                   />
                 );
               })}
