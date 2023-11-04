@@ -1,9 +1,15 @@
+import type { FederalDeputy } from "@/interfaces";
+
 import { formatDate, formatCPFCNPJ } from "@/utils";
 
-export function PersonalInfoTab({ federalDeputyBaseInfo }) {
+interface Props {
+  federalDeputyBaseInfo: FederalDeputy;
+}
+
+export function PersonalInfoTab({ federalDeputyBaseInfo }: Props) {
   return (
     <>
-      <ul className="max-w-md max-w-sm md:min-w-400px divide-y divide-gray-200 dark:divide-gray-700">
+      <ul className="max-w-sm md:min-w-400px divide-y divide-gray-200 dark:divide-gray-700">
         <li className="pb-3 sm:pb-4">
           <div className="flex items-center space-x-4">
             <div className="flex-1 min-w-0">
