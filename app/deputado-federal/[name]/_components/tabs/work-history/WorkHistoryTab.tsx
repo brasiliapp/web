@@ -1,6 +1,12 @@
+import type { WorkHistory } from "@/interfaces";
+
 import ExperienceItem from "./ExperienceItem";
 
-export function WorkHistoryTab({ federalDeputyWorkHistory }) {
+interface Props {
+  federalDeputyWorkHistory: WorkHistory[];
+}
+
+export function WorkHistoryTab({ federalDeputyWorkHistory }: Props) {
   return (
     <>
       {federalDeputyWorkHistory?.length > 0 && (

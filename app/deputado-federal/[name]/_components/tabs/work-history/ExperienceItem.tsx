@@ -1,3 +1,12 @@
+interface Props {
+  title: string;
+  company: string;
+  companyUf: string;
+  companyCountry: string;
+  start: number;
+  end: number;
+}
+
 export default function ExperienceItem({
   title,
   company,
@@ -5,7 +14,7 @@ export default function ExperienceItem({
   companyCountry,
   start,
   end,
-}) {
+}: Props) {
   return (
     <li className="mb-10 ml-6">
       <span className="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900">
