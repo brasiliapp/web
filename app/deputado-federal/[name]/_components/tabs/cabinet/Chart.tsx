@@ -1,3 +1,5 @@
+import type { MonthlyExpense } from "@/interfaces";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,7 +17,7 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 const monthNamesBR = {
@@ -33,18 +35,22 @@ const monthNamesBR = {
   12: "dez",
 };
 
-function Chart({ data }) {
+interface Props {
+  data: MonthlyExpense[];
+}
+
+function Chart({ data }: Props) {
   data.sort((a, b) => a.month - b.month);
 
   const months = data?.map((item) => monthNamesBR[item.month]);
   const availableAmounts = data.map((item) =>
-    parseFloat(item.available_amount.replace(",", ".").replace(".", ""))
+    parseFloat(item.available_amount.replace(",", ".").replace(".", "")),
   );
   const expenseAmounts = data.map((item) =>
-    parseFloat(item.expense_amount.replace(",", ".").replace(".", ""))
+    parseFloat(item.expense_amount.replace(",", ".").replace(".", "")),
   );
   const differenceAmounts = availableAmounts.map(
-    (amount, index) => amount - expenseAmounts[index]
+    (amount, index) => amount - expenseAmounts[index],
   );
 
   const chartData = {
@@ -76,13 +82,9 @@ function Chart({ data }) {
 
   const options = {
     scales: {
-      yAxes: [
-        {
-          ticks: {
-            beginAtZero: true,
-          },
-        },
-      ],
+      y: {
+        beginAtZero: true,
+      },
     },
   };
 

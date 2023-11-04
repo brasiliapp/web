@@ -1,8 +1,14 @@
+import type { Cabinet } from "@/interfaces";
+
 import { Fragment } from "react";
 
 import Chart from "./Chart";
 
-export function CabinetTab({ cabinetData }) {
+interface Props {
+  cabinetData: Cabinet;
+}
+
+export function CabinetTab({ cabinetData }: Props) {
   return (
     <>
       <p>
