@@ -1,3 +1,5 @@
+import type { PhoneNumber } from "@/types";
+
 export interface FederalDeputy extends FederalDeputyPoliticalInfo {
   cpf: string;
   dataFalecimento: string;
@@ -10,6 +12,7 @@ export interface FederalDeputy extends FederalDeputyPoliticalInfo {
   ufNascimento: string;
   ultimoStatus: {
     nome: string;
+    email: string;
     condicaoEleitoral: string;
     data: string;
     descricaoStatus: string;
@@ -20,7 +23,7 @@ export interface FederalDeputy extends FederalDeputyPoliticalInfo {
       nome: string;
       predio: string;
       sala: string;
-      telefone: string;
+      telefone: PhoneNumber;
     };
     nomeEleitoral: string;
     situacao: string;

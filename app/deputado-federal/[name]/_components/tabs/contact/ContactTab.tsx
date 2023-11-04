@@ -1,9 +1,16 @@
+import type { FederalDeputy } from "@/interfaces";
+import type { PhoneNumber } from "@/types";
+
 import { getFormatedPhoneNumber } from "@/utils";
 
-export function ContactTab({ federalDeputyBaseInfo }) {
+interface Props {
+  federalDeputyBaseInfo: FederalDeputy;
+}
+
+export function ContactTab({ federalDeputyBaseInfo }: Props) {
   return (
     <>
-      <ul className="max-w-md max-w-sm md:min-w-400px divide-y divide-gray-200 dark:divide-gray-700">
+      <ul className="max-w-sm md:min-w-400px divide-y divide-gray-200 dark:divide-gray-700">
         <li className="pb-3 sm:pb-4">
           <div className="flex items-center space-x-4">
             <div className="flex-1 min-w-0">
@@ -23,12 +30,10 @@ export function ContactTab({ federalDeputyBaseInfo }) {
                 Onde encontrar
               </p>
               <p className="text-sm text-gray-500 truncate dark:text-gray-400 whitespace-normal">
-                {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.andar}°
-                andar, Sala{" "}
-                {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.nome} do
-                prédio{" "}
-                {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.predio} na
-                Praça dos Poderes, Brasilia/DF
+                {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.andar}° andar,
+                Sala {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.nome} do
+                prédio {federalDeputyBaseInfo?.ultimoStatus?.gabinete?.predio}{" "}
+                na Praça dos Poderes, Brasilia/DF
               </p>
             </div>
           </div>
@@ -53,7 +58,7 @@ export function ContactTab({ federalDeputyBaseInfo }) {
                     federalDeputyBaseInfo?.ultimoStatus?.gabinete?.telefone.replace(
                       /\D/g,
                       "",
-                    ),
+                    ) as PhoneNumber,
                   )}`}
                   className="flex items-center text-sm bg-success-500 hover:bg-success-700 text-white font py-2 px-4 rounded"
                   title={`Ligue agora para ${federalDeputyBaseInfo?.nomeCivil}`}
