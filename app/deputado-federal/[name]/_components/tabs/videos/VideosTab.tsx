@@ -1,6 +1,13 @@
+import type { Speech } from "@/interfaces";
+
 import EventItem from "./EventItem";
 
-export function VideosTab({ speechesData, federalDeputyName }) {
+interface Props {
+  speechesData: Speech[];
+  federalDeputyName: string;
+}
+
+export function VideosTab({ speechesData, federalDeputyName }: Props) {
   return (
     <>
       {speechesData?.length === 0 && (

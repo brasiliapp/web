@@ -1,3 +1,15 @@
+import type { VideoLink } from "@/interfaces";
+
+interface Props {
+  id: number;
+  title: string;
+  date: string;
+  time: string;
+  place: string;
+  videos: VideoLink[];
+  name: string;
+}
+
 export default function EventItem({
   date,
   title,
@@ -6,7 +18,7 @@ export default function EventItem({
   id,
   videos,
   name,
-}) {
+}: Props) {
   return (
     <li className="mb-10 ml-6">
       <span className="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900">
@@ -30,11 +42,11 @@ export default function EventItem({
       </time>
       <div className="container mx-auto p-4">
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {videos.map((video, index) => {
+          {videos.map((video) => {
             const url = `https://www.camara.leg.br/evento-legislativo/${id}/?${video?.video_param
               ?.split("&")
               .map((param) =>
-                param.split("=").map(encodeURIComponent).join("=")
+                param.split("=").map(encodeURIComponent).join("="),
               )
               .join("&")}&trechosOrador=${encodeURIComponent(name)}&crawl=no`;
 
@@ -47,7 +59,6 @@ export default function EventItem({
                   <video
                     controls
                     className="w-full rounded-lg"
-                    loading="lazy"
                     preload="auto"
                     src={video?.mp4_url}
                   >
