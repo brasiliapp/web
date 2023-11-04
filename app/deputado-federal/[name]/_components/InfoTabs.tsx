@@ -16,7 +16,7 @@ import { tabs } from "./tabs";
 
 interface Props {
   expenses: Expense[];
-  monthlyCabinetExpenses: MonthlyExpense[];
+  monthlyCabinetExpense: MonthlyExpense;
   cabinetData: Cabinet;
   speechesData: Speech[];
   baseInfo: FederalDeputy;
@@ -25,7 +25,7 @@ interface Props {
 
 export function InfoTabs({
   expenses,
-  monthlyCabinetExpenses,
+  monthlyCabinetExpense,
   cabinetData,
   speechesData,
   baseInfo,
@@ -44,7 +44,7 @@ export function InfoTabs({
           <CardBody className="px-0 md:px-6 sm:px-4">
             <tabs.Expenses
               expenses={expenses}
-              monthlyCabinetExpenses={monthlyCabinetExpenses}
+              monthlyCabinetExpense={monthlyCabinetExpense}
             />
           </CardBody>
         </Card>

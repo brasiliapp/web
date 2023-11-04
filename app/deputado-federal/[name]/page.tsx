@@ -77,12 +77,12 @@ export default async function FederalDeputy({ params, searchParams }) {
       <section className="mt-3 z-0 flex flex-col relative justify-between rounded-large w-full">
         <Header federalDeputyBaseInfo={data.baseInfo} />
         <InfoTabs
-          expenses={data.expenses}
-          monthlyCabinetExpenses={data.monthlyCabinetExpenses}
-          cabinetData={data.cabinetData}
+          expenses={data.expenses!}
+          monthlyCabinetExpense={data.monthlyCabinetExpense!}
+          cabinetData={data.cabinetData!}
           speechesData={data.speechesData}
-          baseInfo={data.baseInfo}
-          workHistory={data.workHistory}
+          baseInfo={data.baseInfo!}
+          workHistory={data.workHistory!}
         />
       </section>
       <Footer />
@@ -95,12 +95,12 @@ async function getData(
   monthQueryParam: number | undefined,
   yearQueryParam: number | undefined,
 ): Promise<{
-  cabinetData: Cabinet | never[];
+  cabinetData: Cabinet | undefined;
   description: string;
   expenses: Expense[] | undefined;
   baseInfo: FederalDeputy | undefined;
   workHistory: WorkHistory[] | undefined;
-  monthlyCabinetExpenses: MonthlyExpense | null;
+  monthlyCabinetExpense: MonthlyExpense | null;
   speechesData: Speech[];
   title: string;
 }> {
@@ -166,7 +166,7 @@ async function getData(
     console.error("fail to get cabinetData", error);
   }
 
-  const monthlyCabinetExpenses = cabinetData!.montly_expenses.find(
+  const monthlyCabinetExpense = cabinetData!.montly_expenses.find(
     (item: MonthlyExpense) => monthQueryParam === item.month,
   );
 
@@ -186,12 +186,12 @@ async function getData(
   );
 
   return {
-    cabinetData: cabinetData ?? [],
+    cabinetData: cabinetData,
     description: seoDescription,
     expenses: monthExpenses,
     baseInfo: baseInfo,
     workHistory: workHistory,
-    monthlyCabinetExpenses: monthlyCabinetExpenses ?? null,
+    monthlyCabinetExpense: monthlyCabinetExpense ?? null,
     speechesData: speechesData?.data ?? [],
     title: seoTitle,
   };

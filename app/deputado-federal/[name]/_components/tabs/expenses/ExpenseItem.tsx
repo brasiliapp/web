@@ -1,3 +1,5 @@
+import type { Cpf, Cnpj } from "@/types";
+
 import {
   formatMonetaryValue,
   formatDate,
@@ -9,13 +11,20 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-  Button,
-  User,
   Divider,
   Chip,
 } from "@nextui-org/react";
 
 const skeletonStyle = "bg-[#D4D4D866] animate-pulse";
+
+interface Props {
+  value: number;
+  date: string;
+  type: string;
+  supplier: string;
+  supplierId: Cpf | Cnpj;
+  document: string;
+}
 
 export default function ExpenseItem({
   value,
@@ -24,7 +33,7 @@ export default function ExpenseItem({
   supplierId,
   document,
   type,
-}) {
+}: Props) {
   return (
     <li className="mb-10 ml-6">
       <span className="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900 ">
@@ -54,11 +63,12 @@ export default function ExpenseItem({
         <span>Informado em {formatDate(date)}</span>
       </time>
       <p className="mb-4 text-small font-normal text-gray-500 dark:text-gray-400">
-        {identifyPerson(supplierId).name}: {supplier}{" "}
+        {identifyPerson(supplierId)}: {supplier}{" "}
       </p>
       <p className="mb-4 text-small font-normal text-gray-500 dark:text-gray-400">
-        {identifyPerson(supplierId).name === "Empresa" ? "CNPJ" : "CPF"}:{" "}
-        {formatCPFCNPJ(supplierId)}         <Popover placement="bottom" showArrow={true} backdrop="opaque">
+        {identifyPerson(supplierId) === "Empresa" ? "CNPJ" : "CPF"}:{" "}
+        {formatCPFCNPJ(supplierId)}{" "}
+        <Popover placement="bottom" showArrow={true} backdrop="opaque">
           <PopoverTrigger>
             <Chip
               variant="shadow"
@@ -79,14 +89,14 @@ export default function ExpenseItem({
                 Empresa Jabuticaba de laranja do Sul do Norte LTDA.{" "}
               </div>
               <div className="text-small py-2 text-gray-500">
-                <span class="font-semibold">Data de abertura:</span> 18/02/2020{" "}
+                <span className="font-semibold">Data de abertura:</span> 18/02/2020{" "}
                 <i>(3 anos, 7 meses e 20 dias)</i>
               </div>
               <div className="text-small py-2 text-gray-500">
-                <span class="font-semibold">Capital social:</span> R$ 5.000,00
+                <span className="font-semibold">Capital social:</span> R$ 5.000,00
               </div>
               <div className="text-small py-2 text-gray-500">
-                <span class="font-semibold">Sócios:</span>
+                <span className="font-semibold">Sócios:</span>
               </div>
 
               <div
@@ -112,9 +122,12 @@ export default function ExpenseItem({
                 informações completas dos fornecedores.
               </p>
               <p className="text-small py-2 text-gray-500">
-                <i>Os dados exibidos aqui, por enquanto não são dados reais. Se você tem alguma sugestão para essa funcionalidade abra um
-                issue no github ou envie um e-mail para
-                contato@brasiliapp.com.br</i>
+                <i>
+                  Os dados exibidos aqui, por enquanto não são dados reais. Se
+                  você tem alguma sugestão para essa funcionalidade abra um
+                  issue no github ou envie um e-mail para
+                  contato@brasiliapp.com.br
+                </i>
               </p>
             </div>
           </PopoverContent>

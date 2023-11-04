@@ -1,5 +1,7 @@
 "use client";
 
+import type { Expense, MonthlyExpense } from "@/interfaces";
+
 import { useState, useEffect } from "react";
 import { useSearchParams, useParams } from "next/navigation";
 import { CircularProgress, Divider } from "@nextui-org/react";
@@ -9,25 +11,37 @@ import ExpenseItem from "./ExpenseItem";
 import { MonthChanger } from "./MonthChanger";
 import { getTotalExpense, formatMonetaryValue } from "@/utils";
 
-export function ExpensesTab({
-  expenses,
-  monthlyCabinetExpenses,
-}) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentDate, setCurrentDate] = useState({
+interface Props {
+  expenses: Expense[];
+  monthlyCabinetExpense: MonthlyExpense;
+}
+
+export function ExpensesTab({ expenses, monthlyCabinetExpense }: Props) {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const [_, setCurrentDate] = useState<{
+    numericMonth: string;
+    fullMonth: string;
+    year: string;
+  }>({
     numericMonth: "",
     fullMonth: "",
     year: "",
   });
 
-  const { name: federalDeputyNameAndId } = useParams();
+  const routeParams = useParams();
+  const federalDeputyNameAndId = routeParams!.name as string;
   const routeQueryParams = useSearchParams();
 
   useEffect(() => {
     setIsLoading(false);
   }, [federalDeputyNameAndId, routeQueryParams]);
 
-  const handleDateChange = (newDate) => {
+  const handleDateChange = (newDate: {
+    numericMonth: "";
+    fullMonth: "";
+    year: "";
+  }) => {
     setIsLoading(true);
     setCurrentDate(newDate);
   };
@@ -74,26 +88,24 @@ export function ExpensesTab({
         <>
           <ExpenseCategories expenses={expenses} />
           <Divider className="my-5" />
-          {monthlyCabinetExpenses && (
+          {monthlyCabinetExpense && (
             <div
               className="bg-yellow-100 mb-5 border-l-4 border-yellow-100 text-yellow-700 p-4 rounded-lg"
               role="alert"
             >
               Além da cota parlamentar foi utilizado{" "}
-              <i>R$ {monthlyCabinetExpenses.expense_amount}</i> de{" "}
-              <i> R$ {monthlyCabinetExpenses.available_amount}</i> disponível da
+              <i>R$ {monthlyCabinetExpense.expense_amount}</i> de{" "}
+              <i> R$ {monthlyCabinetExpense.available_amount}</i> disponível da
               verba de gabinete.
             </div>
           )}
           <ol className="relative border-l border-gray-200 dark:border-gray-700 ">
             {expenses
-              .sort(
-                (a, b) => new Date(b.dataDocumento) - new Date(a.dataDocumento),
-              )
-              .map((expense) => {
+              .sort((a, b) => (b.dataDocumento < a.dataDocumento ? -1 : 1))
+              .map((expense, index) => {
                 return (
                   <ExpenseItem
-                    key={expense.id}
+                    key={index}
                     value={expense.valorLiquido}
                     date={expense.dataDocumento}
                     type={expense.tipoDespesa}

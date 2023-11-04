@@ -1,6 +1,8 @@
+import type { Cnpj, Cpf } from "@/types";
+
 export interface Expense {
   ano: number;
-  cnpjCpfFornecedor: string;
+  cnpjCpfFornecedor: Cpf | Cnpj;
   codDocumento: number;
   codLote: number;
   codTipoDocumento: number;
