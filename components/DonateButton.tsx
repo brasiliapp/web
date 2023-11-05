@@ -1,5 +1,3 @@
-import * as React from "react";
-
 function DonateButton() {
   return (
     <div className="flex justify-center">
