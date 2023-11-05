@@ -1,3 +1,5 @@
+import type { Expense } from "@/interfaces";
+
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
 
 import {
@@ -6,12 +8,16 @@ import {
   removeDotsFromPhrase,
 } from "@/utils";
 
-export default function ExpenseCategories({ expenses }) {
+interface Props {
+  expenses: Expense[];
+}
+
+export default function ExpenseCategories({ expenses }: Props) {
   const expensesTypesPresentOnExpensesSet = new Set(
-    expenses.map((expense) => expense.tipoDespesa)
+    expenses.map((expense) => expense.tipoDespesa),
   );
   const expensesTypesPresentOnExpenses = Array.from(
-    expensesTypesPresentOnExpensesSet
+    expensesTypesPresentOnExpensesSet,
   ).sort();
 
   return (
@@ -20,11 +26,11 @@ export default function ExpenseCategories({ expenses }) {
       <ul className="flex flex-row gap-2 py-4 overflow-x-scroll">
         {expensesTypesPresentOnExpenses.map((expenseType) => {
           const treatedExpenseType = removeDotsFromPhrase(
-            getCapitalizedPhrase(expenseType)
+            getCapitalizedPhrase(expenseType),
           );
           const totalExpenseValueByType = calculateTotalByExpenseType(
             expenses,
-            expenseType
+            expenseType,
           );
 
           return (
@@ -47,7 +53,10 @@ export default function ExpenseCategories({ expenses }) {
   );
 }
 
-export function calculateTotalByExpenseType(expenses, expenseType) {
+export function calculateTotalByExpenseType(
+  expenses: Expense[],
+  expenseType: string,
+) {
   const totalCost = expenses?.reduce((accumulator, expense) => {
     if (expense.tipoDespesa !== expenseType) {
       return accumulator + 0;

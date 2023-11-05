@@ -1,23 +1,31 @@
-"use client";
-
 import React, { useState } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { Button } from "@nextui-org/react";
 
-export const MonthChanger = ({ changeDateHandler }) => {
+interface Props {
+  changeDateHandler: (newDate: {
+    numericMonth: string;
+    fullMonth: string;
+    year: string;
+  }) => void;
+}
+
+export const MonthChanger = ({ changeDateHandler }: Props) => {
   const router = useRouter();
 
   const searchParams = useSearchParams();
 
-  const routeQueryMonth = searchParams.get("mes");
-  const routeQueryYear = searchParams.get("ano");
-  const { name: federalDeputyNameAndId } = useParams();
+  const routeQueryMonth = searchParams!.get("mes");
+  const routeQueryYear = searchParams!.get("ano");
+
+  const params = useParams();
+  const federalDeputyNameAndId = params!.name;
 
   const [displayDate, setDisplayDate] = useState(
-    getInitialDisplayDate(routeQueryYear, routeQueryMonth)
+    getInitialDisplayDate(routeQueryYear, routeQueryMonth),
   );
 
-  const changeDateMonthByOffset = (offset) => {
+  const changeDateMonthByOffset = (offset: number): void => {
     const newDate = new Date(displayDate);
     newDate.setMonth(newDate.getMonth() + offset);
     setDisplayDate(newDate);
@@ -25,13 +33,13 @@ export const MonthChanger = ({ changeDateHandler }) => {
     router.push(
       `${federalDeputyNameAndId}?&mes=${(newDate.getMonth() + 1)
         .toString()
-        .padStart(2, "0")}&ano=${newDate.getFullYear()}`
+        .padStart(2, "0")}&ano=${newDate.getFullYear()}`,
     );
 
     changeDateHandler({
       numericMonth: (newDate.getMonth() + 1).toString().padStart(2, "0"),
       fullMonth: newDate.toLocaleString("default", { month: "long" }),
-      year: newDate.getFullYear(),
+      year: newDate.getFullYear().toString(),
     });
   };
 
@@ -88,17 +96,20 @@ export const MonthChanger = ({ changeDateHandler }) => {
   );
 };
 
-function getInitialDisplayDate(year, month) {
+function getInitialDisplayDate(
+  year: string | undefined | null,
+  month: string | undefined | null,
+): Date {
   if (!year && !month) {
     const currentDate = new Date();
     return currentDate;
   }
 
-  const monthIndex = month - 1; // jan: 0 / dec: 11
-  return new Date(year, monthIndex);
+  const monthIndex = parseInt(month!) - 1; // jan: 0 / dec: 11
+  return new Date(parseInt(year!), monthIndex);
 }
 
-function getIsDisplayDateUpToSameMonthOfNow(displayDate) {
+function getIsDisplayDateUpToSameMonthOfNow(displayDate: Date): boolean {
   const displayDatePlusOneMonth = new Date(displayDate);
   displayDatePlusOneMonth.setMonth(displayDatePlusOneMonth.getMonth() + 1);
 

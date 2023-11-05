@@ -38,9 +38,9 @@ export function ExpensesTab({ expenses, monthlyCabinetExpense }: Props) {
   }, [federalDeputyNameAndId, routeQueryParams]);
 
   const handleDateChange = (newDate: {
-    numericMonth: "";
-    fullMonth: "";
-    year: "";
+    numericMonth: string;
+    fullMonth: string;
+    year: string;
   }) => {
     setIsLoading(true);
     setCurrentDate(newDate);
