@@ -9,8 +9,8 @@ import type {
   WorkHistory,
 } from "@/interfaces";
 
+import { Card, CardBody, Tab, Tabs } from "@nextui-org/react";
 import { Key, useState } from "react";
-import { Tab, Tabs, Card, CardBody } from "@nextui-org/react";
 
 import { tabs } from "./tabs";
 
@@ -32,11 +32,10 @@ export function InfoTabs({
   workHistory,
 }: Props) {
   const [selectedTab, setSelectedTab] = useState<Key>("gastos");
-
   return (
     <Tabs
       aria-label="Options"
-      selectedKey={selectedTab}
+      selectedKey={selectedTab !== null ? String(selectedTab) : null}
       onSelectionChange={(key: Key) => setSelectedTab(key)}
     >
       <Tab key="despesas" title="Despesas" className="">
