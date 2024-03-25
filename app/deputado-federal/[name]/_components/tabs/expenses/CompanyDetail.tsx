@@ -5,6 +5,7 @@ import {
   PopoverTrigger,
   Chip,
   PopoverContent,
+  Divider,
 } from "@nextui-org/react";
 
 const skeletonStyle = "bg-[#D4D4D866] animate-pulse";
@@ -77,16 +78,17 @@ export const CompanyDetail = ({ supplierId }: { supplierId: string }) => {
               <i>{}</i>
             </div>
             <div className="text-small py-2 text-gray-500">
-              <span className="font-semibold">Capital social:</span>
+              <span className="font-semibold">Capital social:</span>{" "}
               {formatMonetaryValue(Number(companyInformation?.capital_social))}
             </div>
-            <div className="text-small py-2 text-gray-500">
+            <Divider />
+            <div className="text-small py-2 pb-1 text-gray-500">
               <span className="font-semibold">Sócios:</span>
             </div>
             {companyInformation?.qsa.map((qsa) => {
               return (
                 <div className="flex flex-col" key={qsa.cnpj_cpf_do_socio}>
-                  <div className="text-small pt-2 font-bold text-gray-600">
+                  <div className="text-small pt-2  text-gray-600">
                     {qsa.nome_socio}
                   </div>
                   <small className="!font-normal">
