@@ -85,7 +85,7 @@ export const CompanyDetail = ({ supplierId }: { supplierId: string }) => {
             </div>
             {companyInformation?.qsa.map((qsa) => {
               return (
-                <div className="flex flex-col">
+                <div className="flex flex-col" key={qsa.cnpj_cpf_do_socio}>
                   <div className="text-small pt-2 font-bold text-gray-600">
                     {qsa.nome_socio}
                   </div>
