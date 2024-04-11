@@ -67,7 +67,7 @@ export const MonthChanger = ({ changeDateHandler }: Props) => {
       <div className="mx-4 text-lg text-center">
         {" em "}{" "}
         <u>
-          {displayDate?.toLocaleString("default", { month: "long" })} {"de "}
+          {displayDate?.toLocaleString("pt-br", { month: "long" })} {"de "}
           {displayDate?.getFullYear()}
         </u>
       </div>
